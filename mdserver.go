@@ -45,22 +45,13 @@ func main() {
 
 func postHandler(w http.ResponseWriter, r *http.Request) {
 	params := r.URL.Query()
-	// Извлекаем параметр
-	// Например, в http://127.0.0.1:3000/p1 page = "p1"
-	// в http://127.0.0.1:3000/ page = ""
-	page := params.Get(":page")
-	// Путь к файлу (без расширения)
-	// Например, posts/p1
-	p := path.Join("posts", page)
 
-	var postMD string
-	if page != "" {
-		// если page не пусто, то считаем, что запрашивается файл
-		// получим posts/p1.md
-		postMD = p + ".md"
-	} else {
+	page := params.Get(":page")
+	postMD := path.Join("posts", page)
+
+	if page == "" {
 		// если page пусто, то выдаем главную
-		postMD = p + "/index.md"
+		postMD += "/index.md"
 	}
 
 	post, status, err := posts.Get(postMD)

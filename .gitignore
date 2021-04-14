@@ -1,4 +1,6 @@
-*.exe
 posts/*.[mM][Dd]
 public/uploads/
 mdserver.yaml
+.idea/
+mdserver
+public/static/images/*
