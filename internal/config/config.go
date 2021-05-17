@@ -1,4 +1,4 @@
-﻿package main
+﻿package config
 
 import (
 	"io/ioutil"
@@ -11,7 +11,7 @@ type Config struct {
 	Listen string `yaml:"listen"`
 }
 
-func readConfig(ConfigName string) (x *Config, err error) {
+func ReadConfig(ConfigName string) (x *Config, err error) {
 	var file []byte
 	if file, err = ioutil.ReadFile(ConfigName); err != nil {
 		return nil, err

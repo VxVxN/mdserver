@@ -3,6 +3,8 @@ package main
 import (
 	"html/template"
 	"log"
+	"mdserver/internal/config"
+	"mdserver/internal/post"
 	"net/http"
 	"path"
 	"strings"
@@ -18,11 +20,11 @@ var (
 	// компилируем шаблоны, если не удалось, то выходим
 	postTemplate  = template.Must(template.ParseFiles(path.Join("templates", "layout.html"), path.Join("templates", "post.html")))
 	errorTemplate = template.Must(template.ParseFiles(path.Join("templates", "layout.html"), path.Join("templates", "error.html")))
-	posts         = newPostArray()
+	posts         = post.NewPostArray()
 )
 
 func main() {
-	cfg, err := readConfig(configFileName)
+	cfg, err := config.ReadConfig(configFileName)
 	if err != nil {
 		log.Fatalln(err)
 	}

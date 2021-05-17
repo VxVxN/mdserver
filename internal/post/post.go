@@ -1,4 +1,4 @@
-package main
+package post
 
 import (
 	"fmt"
@@ -22,7 +22,7 @@ type postArray struct {
 	sync.RWMutex
 }
 
-func newPostArray() *postArray {
+func NewPostArray() *postArray {
 	p := postArray{}
 	p.Items = make(map[string]post)
 	return &p
