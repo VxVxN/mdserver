@@ -6,30 +6,35 @@ import (
 	"mdserver/internal/config"
 	"mdserver/internal/post"
 	"net/http"
+	"os"
 	"path"
 	"strings"
 
 	"github.com/bmizerany/pat"
 )
 
-const (
-	configFileName = "mdserver.yaml"
-)
-
 var (
-	// компилируем шаблоны, если не удалось, то выходим
-	postTemplate  = template.Must(template.ParseFiles(path.Join("templates", "layout.html"), path.Join("templates", "post.html")))
-	errorTemplate = template.Must(template.ParseFiles(path.Join("templates", "layout.html"), path.Join("templates", "error.html")))
+	workDir, configFileName string
+	postTemplate   *template.Template
+	errorTemplate  *template.Template
 	posts         = post.NewPostArray()
 )
+
+func init() {
+	workDir = path.Dir(os.Args[0])
+	configFileName = path.Join(workDir, "mdserver.yaml")
+
+	postTemplate = template.Must(template.ParseFiles(path.Join(workDir, "templates", "layout.html"), path.Join(workDir, "templates", "post.html")))
+	errorTemplate = template.Must(template.ParseFiles(path.Join(workDir, "templates", "layout.html"), path.Join(workDir, "templates", "error.html")))
+}
 
 func main() {
 	cfg, err := config.ReadConfig(configFileName)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("Failed to read config: %v, name: %s", err, configFileName)
 	}
 	// для отдачи сервером статичных файлов из папки public/static
-	fs := noDirListing(http.FileServer(http.Dir("./public/static")))
+	fs := noDirListing(http.FileServer(http.Dir(workDir+"/public/static")))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	uploads := noDirListing(http.FileServer(http.Dir("./public/uploads")))
@@ -49,7 +54,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 	params := r.URL.Query()
 
 	page := params.Get(":page")
-	postMD := path.Join("posts", page)
+	postMD := path.Join(workDir, "posts", page)
 
 	if page == "" {
 		// если page пусто, то выдаем главную
