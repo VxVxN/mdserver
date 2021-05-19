@@ -2,23 +2,19 @@ package post
 
 import (
 	"html/template"
+	"mdserver/internal/glob"
 	"mdserver/internal/post"
 	"path"
 )
 
 type Controller struct {
-	postTemplate  *template.Template
-	errorTemplate *template.Template
-	posts         *post.PostArray
-
-	workDir string // TODO: get it out of here
+	postTemplate *template.Template
+	posts        *post.PostArray
 }
 
-func NewController(workDir string) *Controller {
+func NewController() *Controller {
 	return &Controller{
-		workDir:       workDir,
-		postTemplate:  template.Must(template.ParseFiles(path.Join(workDir, "templates", "layout.html"), path.Join(workDir, "templates", "post.html"))),
-		errorTemplate: template.Must(template.ParseFiles(path.Join(workDir, "templates", "layout.html"), path.Join(workDir, "templates", "error.html"))),
-		posts:         post.NewPostArray(),
+		postTemplate: template.Must(template.ParseFiles(path.Join(glob.WorkDir, "templates", "layout.html"), path.Join(glob.WorkDir, "templates", "post.html"))),
+		posts:        post.NewPostArray(),
 	}
 }

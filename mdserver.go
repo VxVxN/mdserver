@@ -2,38 +2,31 @@ package main
 
 import (
 	"log"
-	"mdserver/internal/config"
+	"mdserver/internal/glob"
 	"mdserver/internal/handlers/post"
+	"mdserver/pkg/config"
 	"net/http"
-	"os"
 	"path"
 	"strings"
 
 	"github.com/bmizerany/pat"
 )
 
-var (
-	workDir, configFileName string
-)
-
-func init() {
-	workDir = path.Dir(os.Args[0])
-	configFileName = path.Join(workDir, "mdserver.yaml")
-}
-
 func main() {
+	configFileName := path.Join(glob.WorkDir, "mdserver.yaml")
+
 	cfg, err := config.ReadConfig(configFileName)
 	if err != nil {
 		log.Fatalf("Failed to read config: %v, name: %s", err, configFileName)
 	}
 	// для отдачи сервером статичных файлов из папки public/static
-	fs := noDirListing(http.FileServer(http.Dir(workDir + "/public/static")))
+	fs := noDirListing(http.FileServer(http.Dir(glob.WorkDir + "/public/static")))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	uploads := noDirListing(http.FileServer(http.Dir("./public/uploads")))
 	http.Handle("/uploads/", http.StripPrefix("/uploads/", uploads))
 
-	postCtrl := post.NewController(workDir)
+	postCtrl := post.NewController()
 
 	mux := pat.New()
 	mux.Get("/edit/:page", http.HandlerFunc(postCtrl.EditPostHandler))
