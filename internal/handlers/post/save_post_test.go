@@ -1,12 +1,12 @@
 package post
 
 import (
-	"mdserver/internal/glob"
-	"mdserver/pkg/consts"
 	"os"
 	"path"
 	"testing"
 
+	"github.com/VxVxN/mdserver/internal/glob"
+	"github.com/VxVxN/mdserver/pkg/consts"
 	"github.com/stretchr/testify/require"
 )
 

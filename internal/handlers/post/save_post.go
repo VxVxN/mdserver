@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/VxVxN/log"
 	"github.com/VxVxN/mdserver/internal/glob"
 	"github.com/VxVxN/mdserver/pkg/consts"
 	e "github.com/VxVxN/mdserver/pkg/error"
@@ -21,11 +22,13 @@ func (ctrl *Controller) SavePostHandler(w http.ResponseWriter, r *http.Request) 
 
 	errObj := tools.UnmarshalRequest(r, &req)
 	if errObj != nil {
+		log.Error.Printf("Failed to unmarshal request: %v", errObj.Error)
 		errObj.JsonResponse(w)
 		return
 	}
 
 	if errObj = SavePost(req.FileName, req.Text, false); errObj != nil {
+		log.Error.Printf("Failed to save post: %v", errObj.Error)
 		errObj.JsonResponse(w)
 		return
 	}
@@ -42,7 +45,7 @@ func SavePost(fileName, text string, isCreateFile bool) *e.ErrObject {
 	if err != nil {
 		return e.NewError("Can't open file", http.StatusBadRequest, err)
 	}
-	defer file.Close()
+	defer tools.CloseFile(file)
 
 	_, err = file.WriteString(text)
 	if err != nil {

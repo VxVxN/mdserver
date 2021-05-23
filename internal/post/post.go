@@ -2,13 +2,14 @@ package post
 
 import (
 	"fmt"
-	"github.com/russross/blackfriday"
 	"html/template"
 	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/russross/blackfriday"
 )
 
 type post struct {
@@ -60,6 +61,6 @@ func (p *PostArray) Get(md string, isEdit bool) (post, int, error) {
 		}
 		p.Items[md] = post{title, template.HTML(body), info.ModTime().UnixNano()}
 	}
-	post := p.Items[md]
-	return post, 200, nil
+	mdPost := p.Items[md]
+	return mdPost, 200, nil
 }

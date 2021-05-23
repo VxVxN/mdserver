@@ -4,3 +4,5 @@ mdserver.yaml
 .idea/
 mdserver
 public/static/images/*
+logs/*
+go_build_mdserver_arm

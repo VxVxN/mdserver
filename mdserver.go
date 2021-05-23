@@ -1,11 +1,12 @@
 package main
 
 import (
-	"log"
+	slog "log"
 	"net/http"
 	"path"
 	"strings"
 
+	"github.com/VxVxN/log"
 	"github.com/VxVxN/mdserver/internal/glob"
 	"github.com/VxVxN/mdserver/internal/handlers/post"
 	"github.com/VxVxN/mdserver/pkg/config"
@@ -13,13 +14,21 @@ import (
 	"github.com/bmizerany/pat"
 )
 
-func main() {
-	configFileName := path.Join(glob.WorkDir, "mdserver.yaml")
+func init() {
+	pathConfig := path.Join(glob.WorkDir, "mdserver.yaml")
 
-	cfg, err := config.ReadConfig(configFileName)
+	err := config.InitConfig(pathConfig)
 	if err != nil {
-		log.Fatalf("Failed to read config: %v, name: %s", err, configFileName)
+		slog.Fatalf("Failed to read config: %v, name: %s", err, pathConfig)
 	}
+
+	pathLogs := path.Join(glob.WorkDir, "logs/md_server.log")
+	if err = log.Init(pathLogs, getLevelLog(config.Cfg.LevelLog), false); err != nil {
+		slog.Fatalf("Failed to init log: %v", err)
+	}
+}
+
+func main() {
 	// для отдачи сервером статичных файлов из папки public/static
 	fs := noDirListing(http.FileServer(http.Dir(glob.WorkDir + "/public/static")))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
@@ -42,8 +51,13 @@ func main() {
 	mux.Get("/", http.HandlerFunc(postCtrl.PostHandler))
 
 	http.Handle("/", mux)
-	log.Printf("Listening %s...", cfg.Listen)
-	log.Fatalln(http.ListenAndServe(cfg.Listen, nil))
+
+	listen := config.Cfg.Listen
+	log.Info.Printf("Listening %s", listen)
+
+	if err := http.ListenAndServe(listen, nil); err != nil {
+		log.Fatal.Printf("Failed to listen and serve: %v, address: %s", err, listen)
+	}
 }
 
 // обертка для http.FileServer, чтобы она не выдавала список файлов
@@ -51,11 +65,22 @@ func main() {
 // то будет видно список файлов внутри каталога.
 // noDirListing - вернет 404 ошибку в этом случае.
 func noDirListing(h http.Handler) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasSuffix(r.URL.Path, "/") || r.URL.Path == "" {
+			log.Error.Printf("The path not found: %s", r.URL.Path)
 			http.NotFound(w, r)
 			return
 		}
 		h.ServeHTTP(w, r)
-	})
+	}
+}
+
+func getLevelLog(lvlLog config.LVLLog) log.LevelLog {
+	switch lvlLog {
+	case config.DebugLog:
+		return log.DebugLog
+	case config.TraceLog:
+		return log.TraceLog
+	}
+	return log.CommonLog
 }

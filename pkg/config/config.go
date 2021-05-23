@@ -6,19 +6,30 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// Config - structure for reading the configuration file.
-type Config struct {
-	Listen string `yaml:"listen"`
+var Cfg *config
+
+// config - structure for reading the configuration file.
+type config struct {
+	Listen   string `yaml:"listen"`
+	LevelLog LVLLog `yaml:"level_log"`
 }
 
-func ReadConfig(ConfigName string) (x *Config, err error) {
+type LVLLog string
+
+const (
+	CommonLog LVLLog = "common"
+	DebugLog         = "debug"
+	TraceLog         = "trace"
+)
+
+func InitConfig(ConfigName string) (err error) {
 	var file []byte
 	if file, err = ioutil.ReadFile(ConfigName); err != nil {
-		return nil, err
+		return err
 	}
-	x = new(Config)
-	if err = yaml.Unmarshal(file, x); err != nil {
-		return nil, err
+	Cfg = &config{}
+	if err = yaml.Unmarshal(file, Cfg); err != nil {
+		return err
 	}
-	return x, nil
+	return nil
 }

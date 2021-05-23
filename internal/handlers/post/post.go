@@ -1,37 +1,44 @@
 package post
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 	"path"
 
+	"github.com/VxVxN/log"
 	"github.com/VxVxN/mdserver/internal/glob"
 	"github.com/VxVxN/mdserver/pkg/consts"
+	e "github.com/VxVxN/mdserver/pkg/error"
 )
 
 func (ctrl *Controller) PostHandler(w http.ResponseWriter, r *http.Request) {
-	ctrl.post(w, r, false)
+	if errObj := ctrl.getPost(w, r, false); errObj != nil {
+		log.Error.Printf("Failed to edit post: %v", errObj.Error)
+		errObj.JsonResponse(w)
+		return
+	}
 }
 
-func (ctrl *Controller) post(w http.ResponseWriter, r *http.Request, isEdit bool) {
+func (ctrl *Controller) getPost(w http.ResponseWriter, r *http.Request, isEdit bool) *e.ErrObject {
 	params := r.URL.Query()
 
 	page := params.Get(":page")
 	postMD := path.Join(glob.WorkDir, "posts", page)
 
 	if page == "" {
-		// если page пусто, то выдаем главную
+		// if the page is empty, then we give out the main page
 		postMD += "/index"
 	}
 	postMD += consts.ExtMd
 
-	post, status, err := ctrl.posts.Get(postMD, isEdit)
+	templatePost, status, err := ctrl.posts.Get(postMD, isEdit)
 	if err != nil {
-		ctrl.ErrorResponse(w, r, status)
-		return
+		err = fmt.Errorf("can't get post: %v, post: %s", err, postMD)
+		return e.NewError("Failed to get post", status, err)
 	}
-	if err := ctrl.postTemplate.ExecuteTemplate(w, "layout", post); err != nil {
-		log.Println(err.Error())
-		ctrl.ErrorResponse(w, r, http.StatusInternalServerError)
+	if err = ctrl.postTemplate.ExecuteTemplate(w, "layout", templatePost); err != nil {
+		err = fmt.Errorf("can't execute template: %v, post: %s", err, templatePost.Title)
+		return e.NewError("Failed to get post", http.StatusInternalServerError, err)
 	}
+	return nil
 }
