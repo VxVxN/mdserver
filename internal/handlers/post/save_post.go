@@ -1,13 +1,14 @@
 package post
 
 import (
-	"mdserver/internal/glob"
-	"mdserver/pkg/consts"
-	e "mdserver/pkg/error"
-	"mdserver/pkg/tools"
 	"net/http"
 	"os"
 	"path"
+
+	"github.com/VxVxN/mdserver/internal/glob"
+	"github.com/VxVxN/mdserver/pkg/consts"
+	e "github.com/VxVxN/mdserver/pkg/error"
+	"github.com/VxVxN/mdserver/pkg/tools"
 )
 
 type RequestSave struct {

@@ -1,4 +1,4 @@
-﻿package config
+package config
 
 import (
 	"io/ioutil"
@@ -6,7 +6,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// Config - структура для считывания конфигурационного файла
+// Config - structure for reading the configuration file.
 type Config struct {
 	Listen string `yaml:"listen"`
 }

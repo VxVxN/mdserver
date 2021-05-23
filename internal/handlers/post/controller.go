@@ -2,10 +2,11 @@ package post
 
 import (
 	"html/template"
-	"mdserver/internal/glob"
-	"mdserver/internal/post"
-	e "mdserver/pkg/error"
 	"path"
+
+	"github.com/VxVxN/mdserver/internal/glob"
+	"github.com/VxVxN/mdserver/internal/post"
+	e "github.com/VxVxN/mdserver/pkg/error"
 )
 
 type Controller struct {

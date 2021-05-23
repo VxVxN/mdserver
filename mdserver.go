@@ -2,12 +2,13 @@ package main
 
 import (
 	"log"
-	"mdserver/internal/glob"
-	"mdserver/internal/handlers/post"
-	"mdserver/pkg/config"
 	"net/http"
 	"path"
 	"strings"
+
+	"github.com/VxVxN/mdserver/internal/glob"
+	"github.com/VxVxN/mdserver/internal/handlers/post"
+	"github.com/VxVxN/mdserver/pkg/config"
 
 	"github.com/bmizerany/pat"
 )

@@ -2,10 +2,11 @@ package post
 
 import (
 	"log"
-	"mdserver/internal/glob"
-	"mdserver/pkg/consts"
 	"net/http"
 	"path"
+
+	"github.com/VxVxN/mdserver/internal/glob"
+	"github.com/VxVxN/mdserver/pkg/consts"
 )
 
 func (ctrl *Controller) PostHandler(w http.ResponseWriter, r *http.Request) {

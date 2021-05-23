@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"html/template"
 	"log"
-	"mdserver/internal/glob"
 	"net/http"
 	"path"
+
+	"github.com/VxVxN/mdserver/internal/glob"
 )
 
 type ErrResponseController struct {
