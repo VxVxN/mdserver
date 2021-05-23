@@ -53,7 +53,7 @@ func (p *PostArray) Get(md string, isEdit bool) (post, int, error) {
 		title := lines[0]
 		var body string
 		if isEdit {
-			body = "<textarea >" + strings.Join(lines[1:], "\n") + "</textarea >"
+			body = "<textarea >" + strings.Join(lines[1:], "\n") + "</textarea >" + "<button id=\"save_post\" type=\"button\">Сохранить</button>"
 		} else {
 			body = strings.Join(lines[1:], "\n")
 			body = string(blackfriday.MarkdownCommon([]byte(body)))

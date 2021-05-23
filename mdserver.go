@@ -29,6 +29,11 @@ func main() {
 	postCtrl := post.NewController()
 
 	mux := pat.New()
+
+	// ajax
+	mux.Post("/save", http.HandlerFunc(postCtrl.SavePostHandler))
+	mux.Post("/save/", http.HandlerFunc(postCtrl.SavePostHandler))
+
 	mux.Get("/edit/:page", http.HandlerFunc(postCtrl.EditPostHandler))
 	mux.Get("/edit/:page/", http.HandlerFunc(postCtrl.EditPostHandler))
 	mux.Get("/:page", http.HandlerFunc(postCtrl.PostHandler))

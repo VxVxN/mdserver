@@ -3,7 +3,7 @@ package post
 import (
 	"log"
 	"mdserver/internal/glob"
-	e "mdserver/pkg/error"
+	"mdserver/pkg/consts"
 	"net/http"
 	"path"
 )
@@ -20,16 +20,17 @@ func (ctrl *Controller) post(w http.ResponseWriter, r *http.Request, isEdit bool
 
 	if page == "" {
 		// если page пусто, то выдаем главную
-		postMD += "/index.md"
+		postMD += "/index"
 	}
+	postMD += consts.ExtMd
 
 	post, status, err := ctrl.posts.Get(postMD, isEdit)
 	if err != nil {
-		e.ErrorHandler(w, r, status)
+		ctrl.ErrorResponse(w, r, status)
 		return
 	}
 	if err := ctrl.postTemplate.ExecuteTemplate(w, "layout", post); err != nil {
 		log.Println(err.Error())
-		e.ErrorHandler(w, r, 500)
+		ctrl.ErrorResponse(w, r, http.StatusInternalServerError)
 	}
 }
