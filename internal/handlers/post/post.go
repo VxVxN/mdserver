@@ -12,14 +12,29 @@ import (
 )
 
 func (ctrl *Controller) PostHandler(w http.ResponseWriter, r *http.Request) {
-	if errObj := ctrl.getPost(w, r, false); errObj != nil {
+	if errObj := ctrl.getPost(w, r); errObj != nil {
 		log.Error.Printf("Failed to edit post: %v", errObj.Error)
 		errObj.JsonResponse(w)
 		return
 	}
 }
 
-func (ctrl *Controller) getPost(w http.ResponseWriter, r *http.Request, isEdit bool) *e.ErrObject {
+func (ctrl *Controller) getPost(w http.ResponseWriter, r *http.Request) *e.ErrObject {
+	postMD := ctrl.getPathToPostMD(r)
+
+	templatePost, status, err := ctrl.posts.Get(postMD, false)
+	if err != nil {
+		err = fmt.Errorf("can't get post: %v, post: %s", err, postMD)
+		return e.NewError("Failed to get post", status, err)
+	}
+	if err = ctrl.postTemplate.ExecuteTemplate(w, "layout", templatePost); err != nil {
+		err = fmt.Errorf("can't execute template: %v, post: %s", err, templatePost.Title)
+		return e.NewError("Failed to get post", http.StatusInternalServerError, err)
+	}
+	return nil
+}
+
+func (ctrl *Controller) getPathToPostMD(r *http.Request) string {
 	params := r.URL.Query()
 
 	page := params.Get(":page")
@@ -30,15 +45,5 @@ func (ctrl *Controller) getPost(w http.ResponseWriter, r *http.Request, isEdit b
 		postMD += "/index"
 	}
 	postMD += consts.ExtMd
-
-	templatePost, status, err := ctrl.posts.Get(postMD, isEdit)
-	if err != nil {
-		err = fmt.Errorf("can't get post: %v, post: %s", err, postMD)
-		return e.NewError("Failed to get post", status, err)
-	}
-	if err = ctrl.postTemplate.ExecuteTemplate(w, "layout", templatePost); err != nil {
-		err = fmt.Errorf("can't execute template: %v, post: %s", err, templatePost.Title)
-		return e.NewError("Failed to get post", http.StatusInternalServerError, err)
-	}
-	return nil
+	return postMD
 }

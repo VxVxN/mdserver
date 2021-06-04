@@ -42,7 +42,6 @@ func (p *PostArray) Get(md string, isEdit bool) (post, int, error) {
 		return post{}, 500, err
 	}
 	if info.IsDir() {
-		// не файл, а папка
 		return post{}, 404, fmt.Errorf("dir")
 	}
 	val, ok := p.Items[md+strconv.FormatBool(isEdit)]
@@ -51,16 +50,28 @@ func (p *PostArray) Get(md string, isEdit bool) (post, int, error) {
 		defer p.RUnlock()
 		fileText, _ := ioutil.ReadFile(md)
 		lines := strings.Split(string(fileText), "\n")
-		title := lines[0]
-		var body string
-		if isEdit {
-			body = "<textarea >" + strings.Join(lines[1:], "\n") + "</textarea >" + "<button id=\"save_post\" type=\"button\">Сохранить</button>"
-		} else {
-			body = strings.Join(lines[1:], "\n")
-			body = string(blackfriday.MarkdownCommon([]byte(body)))
+		body := getBody(lines, isEdit)
+		var title string
+
+		if md == "posts/index.md" {
+			title = "Записки"
 		}
+
 		p.Items[md] = post{title, template.HTML(body), info.ModTime().UnixNano()}
 	}
 	mdPost := p.Items[md]
 	return mdPost, 200, nil
+}
+
+func getBody(lines []string, isEdit bool) string {
+	var body string
+	if isEdit {
+		body = "<textarea id=\"postText\" class=\"p-2 flex-grow-1 mx-3\">" + strings.Join(lines, "\n") + "</textarea>"
+		body += "<div class=\"align-self-center m-3\">" + "<button id=\"savePost\" class=\"btn btn-primary me-2\" style=\"width: 120px\" type=\"button\">Сохранить</button>"
+		body += "<a id=\"cancelSavePost\" class=\"btn btn-secondary\" style=\"width: 120px\" type=\"button\" href=\"/\">Отмена</a>" + "</div>"
+	} else {
+		body = strings.Join(lines, "\n")
+		body = string(blackfriday.MarkdownCommon([]byte(body)))
+	}
+	return body
 }
