@@ -66,9 +66,7 @@ func (p *PostArray) Get(md string, isEdit bool) (post, int, error) {
 func getBody(lines []string, isEdit bool) string {
 	var body string
 	if isEdit {
-		body = "<textarea id=\"postText\" class=\"p-2 flex-grow-1 mx-3\">" + strings.Join(lines, "\n") + "</textarea>"
-		body += "<div class=\"align-self-center m-3\">" + "<button id=\"savePost\" class=\"btn btn-primary me-2\" style=\"width: 120px\" type=\"button\">Сохранить</button>"
-		body += "<a id=\"cancelSavePost\" class=\"btn btn-secondary\" style=\"width: 120px\" type=\"button\" href=\"/\">Отмена</a>" + "</div>"
+		body = strings.Join(lines, "\n")
 	} else {
 		body = strings.Join(lines, "\n")
 		body = string(blackfriday.MarkdownCommon([]byte(body)))

@@ -9,7 +9,26 @@
   <div class="row h-100" style="text-align:left;">
     <div class="col-md-8 col-md-offset-2 d-flex flex-column w-100">
       <h1>{{.Title}}</h1>
-      {{.Body}}
+      <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active flex-grow-1" id="editingTab" data-bs-toggle="tab" data-bs-target="#editing" type="button" role="tab" aria-controls="home" aria-selected="true">Редактировать</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="previewTab" data-bs-toggle="tab" data-bs-target="#preview" type="button" role="tab" aria-controls="profile" aria-selected="false">Превью</button>
+        </li>
+      </ul>
+      <div class="tab-content flex-grow-1" id="myTabContent">
+        <div class="tab-pane fade show active h-100 d-flex flex-column" id="editing" role="tabpanel" aria-labelledby="editing-tab">
+          <textarea id="postText" class="p-2 flex-grow-1 mx-3">{{.Body}}</textarea>
+          <div class="align-self-center m-3">
+            <button id="savePost" class="btn btn-primary me-2" style="width: 120px" type="button">Сохранить</button>
+            <a id="cancelSavePost" class="btn btn-secondary" style="width: 120px" type="button" href="\">Отмена</a>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="preview" role="tabpanel" aria-labelledby="previewTab">
+        </div>
+      </div>
+      <!-- Tabs content -->
     </div>
   </div>
 </div>

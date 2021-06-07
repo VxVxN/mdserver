@@ -40,9 +40,14 @@ func main() {
 
 	mux := pat.New()
 
+	// static
+	mux.Get("/favicon.ico", http.HandlerFunc(faviconHandler))
+
 	// ajax
 	mux.Post("/save", http.HandlerFunc(postCtrl.SavePostHandler))
 	mux.Post("/save/", http.HandlerFunc(postCtrl.SavePostHandler))
+	mux.Post("/preview", http.HandlerFunc(postCtrl.PreviewPostHandler))
+	mux.Post("/preview/", http.HandlerFunc(postCtrl.PreviewPostHandler))
 
 	mux.Get("/edit/:page", http.HandlerFunc(postCtrl.EditPostHandler))
 	mux.Get("/edit/:page/", http.HandlerFunc(postCtrl.EditPostHandler))
@@ -83,4 +88,8 @@ func getLevelLog(lvlLog config.LVLLog) log.LevelLog {
 		return log.TraceLog
 	}
 	return log.CommonLog
+}
+
+func faviconHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, glob.WorkDir+"/public/static/images/favicon.ico")
 }
