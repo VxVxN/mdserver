@@ -64,11 +64,9 @@ func (p *PostArray) Get(md string, isEdit bool) (post, int, error) {
 }
 
 func getBody(lines []string, isEdit bool) string {
-	var body string
-	if isEdit {
-		body = strings.Join(lines, "\n")
-	} else {
-		body = strings.Join(lines, "\n")
+	body := strings.Join(lines, "\n")
+
+	if !isEdit {
 		body = string(blackfriday.MarkdownCommon([]byte(body)))
 	}
 	return body

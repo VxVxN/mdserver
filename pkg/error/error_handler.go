@@ -3,10 +3,10 @@ package error
 import (
 	"encoding/json"
 	"html/template"
-	"log"
 	"net/http"
 	"path"
 
+	"github.com/VxVxN/log"
 	"github.com/VxVxN/mdserver/internal/glob"
 )
 
@@ -19,10 +19,8 @@ func (e *ErrResponseController) InitErrResponseController() {
 }
 
 func (e *ErrResponseController) ErrorResponse(w http.ResponseWriter, r *http.Request, status int) {
-	log.Printf("error %d %s %s\n", status, r.RemoteAddr, r.URL.Path)
 	w.WriteHeader(status)
 	if err := e.errorTemplate.ExecuteTemplate(w, "layout", map[string]interface{}{"Error": http.StatusText(status), "Status": status}); err != nil {
-		log.Println(err.Error())
 		http.Error(w, http.StatusText(500), 500)
 		return
 	}
@@ -33,6 +31,12 @@ func JsonErrorResponse(w http.ResponseWriter, message string, httpStatusCode int
 	w.WriteHeader(httpStatusCode)
 	resp := make(map[string]string)
 	resp["message"] = message
-	jsonResp, _ := json.Marshal(resp)
-	w.Write(jsonResp)
+	jsonResp, err := json.Marshal(resp)
+	if err != nil {
+		log.Error.Printf("Failed to unmarshal request: %v", err)
+	}
+	_, err = w.Write(jsonResp)
+	if err != nil {
+		log.Error.Printf("Failed to write json response: %v", err)
+	}
 }
