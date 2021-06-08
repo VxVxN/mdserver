@@ -6,6 +6,8 @@ import (
 	"path"
 	"strings"
 
+	"github.com/VxVxN/mdserver/internal/handlers/common"
+
 	"github.com/VxVxN/log"
 	"github.com/VxVxN/mdserver/internal/glob"
 	"github.com/VxVxN/mdserver/internal/handlers/post"
@@ -37,6 +39,7 @@ func main() {
 	http.Handle("/uploads/", http.StripPrefix("/uploads/", uploads))
 
 	postCtrl := post.NewController()
+	commonCtrl := common.NewController()
 
 	mux := pat.New()
 
@@ -48,6 +51,9 @@ func main() {
 	mux.Post("/save/", http.HandlerFunc(postCtrl.SavePostHandler))
 	mux.Post("/preview", http.HandlerFunc(postCtrl.PreviewPostHandler))
 	mux.Post("/preview/", http.HandlerFunc(postCtrl.PreviewPostHandler))
+
+	mux.Post("/check_password", http.HandlerFunc(commonCtrl.CheckPasswordHandler))
+	mux.Post("/check_password/", http.HandlerFunc(commonCtrl.CheckPasswordHandler))
 
 	mux.Get("/edit/:page", http.HandlerFunc(postCtrl.EditPostHandler))
 	mux.Get("/edit/:page/", http.HandlerFunc(postCtrl.EditPostHandler))

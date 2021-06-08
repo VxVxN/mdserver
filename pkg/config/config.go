@@ -12,6 +12,7 @@ var Cfg *config
 type config struct {
 	Listen   string `yaml:"listen"`
 	LevelLog LVLLog `yaml:"level_log"`
+	Password string `yaml:"password"`
 }
 
 type LVLLog string

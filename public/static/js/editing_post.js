@@ -2,12 +2,37 @@ const currentPageUrl = window.location.href;
 const splitUrl = currentPageUrl.split('/');
 const fileName = splitUrl[splitUrl.length-1];
 
-document.getElementById("savePost").onclick = function () {
-    const data = {name:fileName, text: document.getElementById("postText").value};
-    sendRequest("/save", data, function (window) {
-        window.location.href = "/";
+// document.getElementById("savePost").onclick = function () {
+//     const data = {name:fileName, text: document.getElementById("postText").value};
+//     sendRequest("/save", data, function (window) {
+//         window.location.href = "/";
+//         return false;
+//     }(window));
+// }
+
+document.getElementById("checkPassword").onclick = function () {
+    const inputPassword = document.getElementById("password").value;
+    if (inputPassword == '') {
+        return;
+    }
+    const data = {password: inputPassword};
+    sendRequest("/check_password", data, function (response) {
+        if (JSON.parse(response).valid) {
+            const data = {name:fileName, text: document.getElementById("postText").value};
+            sendRequest("/save", data, function (window) {
+                window.location.href = "/";
+                return false;
+            }(window));
+        } else {
+            alert("Invalid password");
+        }
+        document.getElementById("password").value = "";
         return false;
-    }(window));
+    });
+}
+
+document.getElementById("cancelPassword").onclick = function () {
+    document.getElementById("password").value = "";
 }
 
 document.getElementById("previewTab").onclick = function () {

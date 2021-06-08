@@ -21,8 +21,30 @@
         <div class="tab-pane fade show active h-100 d-flex flex-column" id="editing" role="tabpanel" aria-labelledby="editing-tab">
           <textarea id="postText" class="p-2 flex-grow-1 mx-3">{{.Body}}</textarea>
           <div class="align-self-center m-3">
-            <button id="savePost" class="btn btn-primary me-2" style="width: 120px" type="button">Сохранить</button>
             <a id="cancelSavePost" class="btn btn-secondary" style="width: 120px" type="button" href="\">Отмена</a>
+            <button id="savePost" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#passwordModal" style="width: 120px" type="button">Сохранить</button>
+            <div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModal" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Проверка пароля для сохранения поста</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <form>
+                      <div class="mb-3">
+                        <label for="password" class="col-form-label">Пароль:</label>
+                        <input type="text" class="form-control" id="password">
+                      </div>
+                    </form>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancelPassword">Отмена</button>
+                    <button type="button" class="btn btn-primary" id="checkPassword">Сохранить</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="tab-pane fade" id="preview" role="tabpanel" aria-labelledby="previewTab">
