@@ -18,13 +18,13 @@ type post struct {
 	ModTime int64
 }
 
-type PostArray struct {
+type Array struct {
 	Items map[string]post
 	sync.RWMutex
 }
 
-func NewPostArray() *PostArray {
-	p := PostArray{}
+func NewPostArray() *Array {
+	p := Array{}
 	p.Items = make(map[string]post)
 	return &p
 }
@@ -32,7 +32,7 @@ func NewPostArray() *PostArray {
 // Get Загружает markdown-файл и конвертирует его в HTML
 // Возвращает объект типа Post
 // Если путь не существует или является каталогом, то возвращаем ошибку
-func (p *PostArray) Get(md string, isEdit bool) (post, int, error) {
+func (p *Array) Get(md string, isEdit bool) (post, int, error) {
 	info, err := os.Stat(md)
 	if err != nil {
 		if os.IsNotExist(err) {

@@ -6,8 +6,9 @@ import (
 	"net/http"
 	"path"
 
+	"github.com/VxVxN/mdserver/pkg/consts"
+
 	"github.com/VxVxN/log"
-	"github.com/VxVxN/mdserver/internal/glob"
 )
 
 type ErrResponseController struct {
@@ -15,7 +16,7 @@ type ErrResponseController struct {
 }
 
 func (e *ErrResponseController) InitErrResponseController() {
-	e.errorTemplate = template.Must(template.ParseFiles(path.Join(glob.WorkDir, "templates", "layout.html"), path.Join(glob.WorkDir, "templates", "error.html")))
+	e.errorTemplate = template.Must(template.ParseFiles(path.Join(consts.PathToTemplates, "layout.html"), path.Join(consts.PathToTemplates, "error.html")))
 }
 
 func (e *ErrResponseController) ErrorResponse(w http.ResponseWriter, r *http.Request, status int) {

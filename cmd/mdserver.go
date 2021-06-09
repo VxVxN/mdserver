@@ -17,22 +17,21 @@ import (
 )
 
 func init() {
-	pathConfig := path.Join(glob.WorkDir, "mdserver.yaml")
+	pathConfig := path.Join(glob.WorkDir, "..", "mdserver.yaml")
 
 	err := config.InitConfig(pathConfig)
 	if err != nil {
 		slog.Fatalf("Failed to read config: %v, name: %s", err, pathConfig)
 	}
 
-	pathLogs := path.Join(glob.WorkDir, "logs/md_server.log")
+	pathLogs := path.Join(glob.WorkDir, "..", "logs/md_server.log")
 	if err = log.Init(pathLogs, getLevelLog(config.Cfg.LevelLog), false); err != nil {
 		slog.Fatalf("Failed to init log: %v", err)
 	}
 }
 
 func main() {
-	// для отдачи сервером статичных файлов из папки public/static
-	fs := noDirListing(http.FileServer(http.Dir(glob.WorkDir + "/public/static")))
+	fs := noDirListing(http.FileServer(http.Dir(glob.WorkDir + "/../public/static")))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	uploads := noDirListing(http.FileServer(http.Dir("./public/uploads")))
@@ -97,5 +96,5 @@ func getLevelLog(lvlLog config.LVLLog) log.LevelLog {
 }
 
 func faviconHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, glob.WorkDir+"/public/static/images/favicon.ico")
+	http.ServeFile(w, r, glob.WorkDir+"/../public/static/images/favicon.ico")
 }

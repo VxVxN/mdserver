@@ -38,7 +38,7 @@ func (ctrl *Controller) getPathToPostMD(r *http.Request) string {
 	params := r.URL.Query()
 
 	page := params.Get(":page")
-	postMD := path.Join(glob.WorkDir, "posts", page)
+	postMD := path.Join(glob.WorkDir, "..", "posts", page)
 
 	if page == "" {
 		// if the page is empty, then we give out the main page
