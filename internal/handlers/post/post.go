@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"net/http"
 	"path"
+	"strings"
 
-	"github.com/VxVxN/log"
 	"github.com/VxVxN/mdserver/internal/glob"
 	"github.com/VxVxN/mdserver/pkg/consts"
+
+	"github.com/VxVxN/log"
 	e "github.com/VxVxN/mdserver/pkg/error"
 )
 
@@ -37,13 +39,13 @@ func (ctrl *Controller) getPost(w http.ResponseWriter, r *http.Request) *e.ErrOb
 func (ctrl *Controller) getPathToPostMD(r *http.Request) string {
 	params := r.URL.Query()
 
-	page := params.Get(":page")
-	postMD := path.Join(glob.WorkDir, "..", "posts", page)
+	dir := params.Get(":dir")
+	dir = strings.Replace(dir, "+", " ", -1)
 
-	if page == "" {
-		// if the page is empty, then we give out the main page
-		postMD += "/index"
-	}
+	file := params.Get(":file")
+	file = strings.Replace(file, "+", " ", -1)
+
+	postMD := path.Join(glob.WorkDir, "..", "posts", dir, file)
 	postMD += consts.ExtMd
 	return postMD
 }

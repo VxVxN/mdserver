@@ -1,24 +1,17 @@
-const currentPageUrl = window.location.href;
-const splitUrl = currentPageUrl.split('/');
-const fileName = splitUrl[splitUrl.length-1];
-
-// document.getElementById("savePost").onclick = function () {
-//     const data = {name:fileName, text: document.getElementById("postText").value};
-//     sendRequest("/save", data, function (window) {
-//         window.location.href = "/";
-//         return false;
-//     }(window));
-// }
-
 document.getElementById("checkPassword").onclick = function () {
     const inputPassword = document.getElementById("password").value;
-    if (inputPassword == '') {
+    if (inputPassword === '') {
         return;
     }
+    const currentPageUrl = decodeURI(window.location.href);
+    const splitUrl = currentPageUrl.split('/');
+    const fileName = splitUrl[splitUrl.length-1];
+    const dirName = splitUrl[splitUrl.length-2];
+
     const data = {password: inputPassword};
     sendRequest("/check_password", data, function (response) {
         if (JSON.parse(response).valid) {
-            const data = {name:fileName, text: document.getElementById("postText").value};
+            const data = {dir_name:dirName, file_name: fileName, text: document.getElementById("postText").value};
             sendRequest("/save", data, function (window) {
                 window.location.href = "/";
                 return false;

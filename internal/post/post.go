@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -12,37 +13,37 @@ import (
 	"github.com/russross/blackfriday"
 )
 
-type post struct {
+type TemplatePost struct {
 	Title   string
 	Body    template.HTML
 	ModTime int64
 }
 
 type Array struct {
-	Items map[string]post
+	Items map[string]TemplatePost
 	sync.RWMutex
 }
 
 func NewPostArray() *Array {
 	p := Array{}
-	p.Items = make(map[string]post)
+	p.Items = make(map[string]TemplatePost)
 	return &p
 }
 
-// Get Загружает markdown-файл и конвертирует его в HTML
-// Возвращает объект типа Post
-// Если путь не существует или является каталогом, то возвращаем ошибку
-func (p *Array) Get(md string, isEdit bool) (post, int, error) {
+// Get Loads the markdown file and converts it to HTML
+// Returns an object of the TemplatePost type
+// If the path does not exist or is a directory, then we return an error
+func (p *Array) Get(md string, isEdit bool) (TemplatePost, int, error) {
 	info, err := os.Stat(md)
 	if err != nil {
 		if os.IsNotExist(err) {
 			// файл не существует
-			return post{}, 404, err
+			return TemplatePost{}, 404, err
 		}
-		return post{}, 500, err
+		return TemplatePost{}, http.StatusInternalServerError, err
 	}
 	if info.IsDir() {
-		return post{}, 404, fmt.Errorf("dir")
+		return TemplatePost{}, http.StatusNotFound, fmt.Errorf("dir")
 	}
 	val, ok := p.Items[md+strconv.FormatBool(isEdit)]
 	if !ok || (ok && val.ModTime != info.ModTime().UnixNano()) {
@@ -51,16 +52,11 @@ func (p *Array) Get(md string, isEdit bool) (post, int, error) {
 		fileText, _ := ioutil.ReadFile(md)
 		lines := strings.Split(string(fileText), "\n")
 		body := getBody(lines, isEdit)
-		var title string
 
-		if md == "posts/index.md" {
-			title = "Записки"
-		}
-
-		p.Items[md] = post{title, template.HTML(body), info.ModTime().UnixNano()}
+		p.Items[md] = TemplatePost{"", template.HTML(body), info.ModTime().UnixNano()}
 	}
 	mdPost := p.Items[md]
-	return mdPost, 200, nil
+	return mdPost, http.StatusOK, nil
 }
 
 func getBody(lines []string, isEdit bool) string {

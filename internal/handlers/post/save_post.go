@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/VxVxN/log"
 	"github.com/VxVxN/mdserver/internal/glob"
@@ -13,7 +14,8 @@ import (
 )
 
 type RequestSave struct {
-	FileName string `json:"name"`
+	DirName  string `json:"dir_name"`
+	FileName string `json:"file_name"`
 	Text     string `json:"text"`
 }
 
@@ -27,15 +29,19 @@ func (ctrl *Controller) SavePostHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if errObj = SavePost(req.FileName, req.Text, false); errObj != nil {
+	if errObj = SavePost(req.DirName, req.FileName, req.Text, false); errObj != nil {
 		log.Error.Printf("Failed to save post: %v", errObj.Error)
 		errObj.JsonResponse(w)
 		return
 	}
 }
 
-func SavePost(fileName, text string, isCreateFile bool) *e.ErrObject {
-	pathToFile := path.Join(glob.WorkDir, "posts", fileName) + consts.ExtMd
+func SavePost(dirName, fileName, text string, isCreateFile bool) *e.ErrObject {
+	dirName = strings.Replace(dirName, "+", " ", -1)
+	fileName = strings.Replace(fileName, "+", " ", -1)
+
+	pathToFile := path.Join(glob.WorkDir, "..", "posts", dirName, fileName) + consts.ExtMd
+
 	flags := os.O_TRUNC | os.O_WRONLY
 	if isCreateFile {
 		flags |= os.O_CREATE
