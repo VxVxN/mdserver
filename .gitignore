@@ -1,4 +1,4 @@
-posts/*.[mM][Dd]
+posts/
 public/uploads/
 mdserver.yaml
 .idea/

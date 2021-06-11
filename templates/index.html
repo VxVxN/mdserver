@@ -1,0 +1,73 @@
+﻿{{define "head"}}
+   <link href="/static/highlight/styles/ir_black.css" rel="stylesheet" media="screen">
+{{end}}
+
+{{define "title"}}{{.Title}} {{end}}
+
+{{define "body"}}
+<div class="container" id="container">
+   <div class="row" style="text-align:left;">
+      <div class="col-md-8 col-md-offset-2">
+         <h1>{{.Title}}</h1>
+         {{.Body}}
+         <!-- create directory modal -->
+         <div class="modal fade" id="createDirectoryModal" tabindex="-1" aria-labelledby="createDirectoryModal" aria-hidden="true">
+            <div class="modal-dialog">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title">Создать директорию</h5>
+                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                     <form>
+                        <div class="mb-3">
+                           <label for="directoryName" class="col-form-label">Имя:</label>
+                           <input type="text" class="form-control" id="directoryName">
+                        </div>
+                     </form>
+                  </div>
+                  <div class="modal-footer">
+                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancelSaveDirectory">Отмена</button>
+                     <button type="button" class="btn btn-primary" id="createDirectory">Создать</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!-- end create directory modal -->
+         <!-- delete directory modal -->
+         <div class="modal fade" id="deleteDirectoryModal" tabindex="-1" aria-labelledby="deleteDirectoryModal" aria-hidden="true">
+            <div class="modal-dialog">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title">Удалить директорию</h5>
+                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                     <form>
+                        <div class="mb-3">
+                           <p class="col-form-label" id="deleteDirectoryName"></p>
+                        </div>
+                     </form>
+                  </div>
+                  <div class="modal-footer">
+                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="deleteDirectory">Удалить</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!-- end delete directory modal -->
+      </div>
+   </div>
+</div>
+{{end}}
+
+{{define "scripts"}}
+   <script src="/static/highlight/highlight.pack.js"></script>
+   <script src="/static/js/index.js"></script>
+   <script src="/static/js/tools.js"></script>
+   <script>hljs.initHighlightingOnLoad();</script>
+   <script type="text/javascript">
+   // $('table').addClass('table table-striped table-bordered table-condensed');
+   </script>
+{{end}}

@@ -33,7 +33,7 @@ func (ctrl *Controller) getPosts(w http.ResponseWriter) *e.ErrObject {
 
 	body := prepareHTML(dirs)
 
-	if err = ctrl.postTemplate.ExecuteTemplate(w, "layout", post.TemplatePost{
+	if err = ctrl.indexTemplate.ExecuteTemplate(w, "layout", post.TemplatePost{
 		Title: "Записки",
 		Body:  template.HTML(body),
 	}); err != nil {
@@ -43,10 +43,10 @@ func (ctrl *Controller) getPosts(w http.ResponseWriter) *e.ErrObject {
 	return nil
 }
 
-func prepareHTML(dirs []*posts.Dir) string {
-	var body string
+func prepareHTML(dirs []*posts.Directory) string {
+	body := "[<a href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#createDirectoryModal\">Создать директорию</a>]"
 	for _, dir := range dirs {
-		body += "<h3>" + dir.DirName + "</h3>"
+		body += "<h3>" + dir.DirName + "</h3>[<a href=\"#\">Создать файл</a>][<a href=\"#\" class=\"deleteDirectory\" data-name=\"" + dir.DirName + "\">Удалить директорию</a>]"
 
 		var mdPosts string
 		for _, file := range dir.Files {
@@ -55,7 +55,7 @@ func prepareHTML(dirs []*posts.Dir) string {
 
 			linkToPost := dirNameWithoutSpace + "/" + fileNameWithoutSpace
 
-			mdPosts += "* [" + file + "](/" + linkToPost + ") [[Редактировать](/edit/" + linkToPost + ")]\n"
+			mdPosts += "* [" + file + "](/" + linkToPost + ") [[Редактировать](/edit/" + linkToPost + ")] [[Удалить](/delete/" + linkToPost + ")]\n"
 		}
 		body += string(blackfriday.MarkdownCommon([]byte(mdPosts)))
 	}

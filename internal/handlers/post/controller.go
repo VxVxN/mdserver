@@ -20,6 +20,7 @@ type Controller struct {
 	mongoClient *mongo.Client
 	mongoPosts  *posts.MongoPosts
 
+	indexTemplate       *template.Template
 	postTemplate        *template.Template
 	editingPostTemplate *template.Template
 	posts               *post.Array
@@ -30,6 +31,7 @@ func NewController(mongoClient *mongo.Client) *Controller {
 	ctrl := &Controller{
 		mongoClient:         mongoClient,
 		mongoPosts:          posts.Init(mongoClient),
+		indexTemplate:       template.Must(template.ParseFiles(pathToLayout, path.Join(consts.PathToTemplates, "index.html"))),
 		postTemplate:        template.Must(template.ParseFiles(pathToLayout, path.Join(consts.PathToTemplates, "post.html"))),
 		editingPostTemplate: template.Must(template.ParseFiles(pathToLayout, path.Join(consts.PathToTemplates, "editing_post.html"))),
 		posts:               post.NewPostArray(),

@@ -11,11 +11,12 @@ document.getElementById("checkPassword").onclick = function () {
     const data = {password: inputPassword};
     sendRequest("/check_password", data, function (response) {
         if (JSON.parse(response).valid) {
-            const data = {dir_name:dirName, file_name: fileName, text: document.getElementById("postText").value};
-            sendRequest("/save", data, function (window) {
+            const successCallback = function () {
                 window.location.href = "/";
                 return false;
-            }(window));
+            };
+            const data = {dir_name:dirName, file_name: fileName, text: document.getElementById("postText").value};
+            sendRequest("/save_post", data, successCallback.bind(this, window));
         } else {
             alert("Invalid password");
         }

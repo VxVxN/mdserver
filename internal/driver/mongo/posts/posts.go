@@ -3,7 +3,10 @@ package posts
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"time"
+
+	e "github.com/VxVxN/mdserver/pkg/error"
 
 	"github.com/VxVxN/mdserver/pkg/tools"
 
@@ -17,7 +20,7 @@ type MongoPosts struct {
 	mongoClient *mongo.Client
 }
 
-type Dir struct {
+type Directory struct {
 	DirName string   `bson:"dir"`
 	Files   []string `bson:"files"`
 }
@@ -47,7 +50,7 @@ func (mgPost *MongoPosts) getCollection() *mongo.Collection {
 //	return &post, nil
 //}
 
-func (mgPost *MongoPosts) GetList() ([]*Dir, error) {
+func (mgPost *MongoPosts) GetList() ([]*Directory, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
 	defer cancel()
 
@@ -57,7 +60,7 @@ func (mgPost *MongoPosts) GetList() ([]*Dir, error) {
 		return nil, err
 	}
 	defer tools.CloseMongoCursor(cur, ctx)
-	var posts []*Dir
+	var posts []*Directory
 
 	err = cur.All(ctx, &posts)
 	if err != nil {
@@ -68,18 +71,34 @@ func (mgPost *MongoPosts) GetList() ([]*Dir, error) {
 	return posts, nil
 }
 
-//func (mgPost *MongoPosts) Insert() (*Post, *e.ErrObject) {
-//	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
-//	defer cancel()
-//
-//	var post Post
-//
-//	_, err := mgPost.getCollection().InsertOne(ctx, Post{})
-//	if err == mongo.ErrNoDocuments {
-//		return nil, e.NewError("Post not found", http.StatusNotFound, err)
-//	} else if err != nil {
-//		return nil, e.NewError("Can't get post", http.StatusInternalServerError, err)
-//	}
-//
-//	return &post, nil
-//}
+func (mgPost *MongoPosts) CreateDirectory(dirName string) *e.ErrObject {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
+	defer cancel()
+
+	_, err := mgPost.getCollection().InsertOne(ctx, Directory{
+		DirName: dirName,
+	})
+	if err == mongo.ErrNoDocuments {
+		return e.NewError("Post not found", http.StatusNotFound, err)
+	} else if err != nil {
+		return e.NewError("Can't create directory to mongo", http.StatusInternalServerError, err)
+	}
+
+	return nil
+}
+
+func (mgPost *MongoPosts) DeleteDirectory(dirName string) *e.ErrObject {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
+	defer cancel()
+
+	_, err := mgPost.getCollection().DeleteOne(ctx, Directory{
+		DirName: dirName,
+	})
+	if err == mongo.ErrNoDocuments {
+		return e.NewError("Post not found", http.StatusNotFound, err)
+	} else if err != nil {
+		return e.NewError("Can't delete directory to mongo", http.StatusInternalServerError, err)
+	}
+
+	return nil
+}

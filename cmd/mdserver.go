@@ -45,8 +45,11 @@ func main() {
 	mux.Get("/favicon.ico", http.HandlerFunc(faviconHandler))
 
 	// ajax
-	Post(mux, "/save", postCtrl.SavePostHandler)
+	Post(mux, "/save_post", postCtrl.SavePostHandler)
 	Post(mux, "/preview", postCtrl.PreviewPostHandler)
+
+	Post(mux, "/create_directory", postCtrl.CreateDirectoryHandler)
+	Post(mux, "/delete_directory", postCtrl.DeleteDirectoryHandler)
 
 	Post(mux, "/check_password", commonCtrl.CheckPasswordHandler)
 

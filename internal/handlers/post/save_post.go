@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/VxVxN/log"
-	"github.com/VxVxN/mdserver/internal/glob"
 	"github.com/VxVxN/mdserver/pkg/consts"
 	e "github.com/VxVxN/mdserver/pkg/error"
 	"github.com/VxVxN/mdserver/pkg/tools"
@@ -40,7 +39,7 @@ func SavePost(dirName, fileName, text string, isCreateFile bool) *e.ErrObject {
 	dirName = strings.Replace(dirName, "+", " ", -1)
 	fileName = strings.Replace(fileName, "+", " ", -1)
 
-	pathToFile := path.Join(glob.WorkDir, "..", "posts", dirName, fileName) + consts.ExtMd
+	pathToFile := path.Join(consts.PathToPosts, dirName, fileName) + consts.ExtMd
 
 	flags := os.O_TRUNC | os.O_WRONLY
 	if isCreateFile {
