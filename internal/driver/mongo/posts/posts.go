@@ -77,9 +77,10 @@ func (mgPost *MongoPosts) CreateDirectory(dirName string) *e.ErrObject {
 
 	_, err := mgPost.getCollection().InsertOne(ctx, Directory{
 		DirName: dirName,
+		Files:   []string{},
 	})
 	if err == mongo.ErrNoDocuments {
-		return e.NewError("Post not found", http.StatusNotFound, err)
+		return e.NewError("Directory not found", http.StatusNotFound, err)
 	} else if err != nil {
 		return e.NewError("Can't create directory to mongo", http.StatusInternalServerError, err)
 	}
@@ -90,14 +91,44 @@ func (mgPost *MongoPosts) CreateDirectory(dirName string) *e.ErrObject {
 func (mgPost *MongoPosts) DeleteDirectory(dirName string) *e.ErrObject {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
 	defer cancel()
+	filter := bson.D{{"dir", dirName}}
+	_, err := mgPost.getCollection().DeleteOne(ctx, filter)
+	if err == mongo.ErrNoDocuments {
+		return e.NewError("Directory not found", http.StatusNotFound, err)
+	} else if err != nil {
+		return e.NewError("Can't delete directory to mongo", http.StatusInternalServerError, err)
+	}
 
-	_, err := mgPost.getCollection().DeleteOne(ctx, Directory{
-		DirName: dirName,
-	})
+	return nil
+}
+
+func (mgPost *MongoPosts) CreatePost(dirName, fileName string) *e.ErrObject {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
+	defer cancel()
+
+	filter := bson.D{{"dir", dirName}}
+	update := bson.D{{"$push", bson.D{{"files", fileName}}}}
+
+	_, err := mgPost.getCollection().UpdateOne(ctx, filter, update)
+	if err == mongo.ErrNoDocuments {
+		return e.NewError("Directory not found", http.StatusNotFound, err)
+	} else if err != nil {
+		return e.NewError("Can't create post to mongo", http.StatusInternalServerError, err)
+	}
+
+	return nil
+}
+
+func (mgPost *MongoPosts) DeletePost(dirName, fileName string) *e.ErrObject {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
+	defer cancel()
+	filter := bson.D{{"dir", dirName}}
+	update := bson.D{{"$pull", bson.D{{"files", fileName}}}}
+	_, err := mgPost.getCollection().UpdateOne(ctx, filter, update)
 	if err == mongo.ErrNoDocuments {
 		return e.NewError("Post not found", http.StatusNotFound, err)
 	} else if err != nil {
-		return e.NewError("Can't delete directory to mongo", http.StatusInternalServerError, err)
+		return e.NewError("Can't delete post to mongo", http.StatusInternalServerError, err)
 	}
 
 	return nil

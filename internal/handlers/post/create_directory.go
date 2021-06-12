@@ -36,7 +36,7 @@ func (ctrl *Controller) CreateDirectoryHandler(w http.ResponseWriter, r *http.Re
 func (ctrl *Controller) createDirectory(req RequestCreateDirectory) *e.ErrObject {
 	pathToDir := path.Join(consts.PathToPosts, req.DirName)
 
-	if err := os.Mkdir(pathToDir, 0644); err != nil {
+	if err := os.Mkdir(pathToDir, 0777); err != nil {
 		err = fmt.Errorf("can't create directory: %v", err)
 		return e.NewError("Failed to create directory", http.StatusInternalServerError, err)
 	}

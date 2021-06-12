@@ -15,7 +15,11 @@ document.getElementById("checkPassword").onclick = function () {
                 window.location.href = "/";
                 return false;
             };
-            const data = {dir_name:dirName, file_name: fileName, text: document.getElementById("postText").value};
+            const data = {
+                dir_name:dirName,
+                file_name: fileName,
+                text: document.getElementById("postText").value,
+            };
             sendRequest("/save_post", data, successCallback.bind(this, window));
         } else {
             alert("Invalid password");

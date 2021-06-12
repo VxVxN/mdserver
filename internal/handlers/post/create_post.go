@@ -1,0 +1,52 @@
+package post
+
+import (
+	"fmt"
+	"net/http"
+	"os"
+	"path"
+
+	"github.com/VxVxN/log"
+	"github.com/VxVxN/mdserver/pkg/consts"
+	e "github.com/VxVxN/mdserver/pkg/error"
+	"github.com/VxVxN/mdserver/pkg/tools"
+)
+
+type RequestCreatePost struct {
+	DirName  string `json:"dir_name"`
+	FileName string `json:"file_name"`
+}
+
+func (ctrl *Controller) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
+	var req RequestCreatePost
+
+	errObj := tools.UnmarshalRequest(r, &req)
+	if errObj != nil {
+		log.Error.Printf("Failed to unmarshal request: %v", errObj.Error)
+		errObj.JsonResponse(w)
+		return
+	}
+
+	if errObj = ctrl.createPost(req); errObj != nil {
+		log.Error.Printf("Failed to create post: %v", errObj.Error)
+		errObj.JsonResponse(w)
+		return
+	}
+}
+
+func (ctrl *Controller) createPost(req RequestCreatePost) *e.ErrObject {
+	pathToDir := path.Join(consts.PathToPosts, req.DirName, req.FileName)
+	pathToDir += consts.ExtMd
+
+	file, err := os.Create(pathToDir)
+	if err != nil {
+		err = fmt.Errorf("can't create post: %v", err)
+		return e.NewError("Failed to create post", http.StatusInternalServerError, err)
+	}
+	tools.CloseFile(file)
+
+	if errObj := ctrl.mongoPosts.CreatePost(req.DirName, req.FileName); errObj != nil {
+		return errObj
+	}
+	return nil
+}

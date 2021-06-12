@@ -45,6 +45,8 @@ func main() {
 	mux.Get("/favicon.ico", http.HandlerFunc(faviconHandler))
 
 	// ajax
+	Post(mux, "/delete_post", postCtrl.DeletePostHandler)
+	Post(mux, "/create_post", postCtrl.CreatePostHandler)
 	Post(mux, "/save_post", postCtrl.SavePostHandler)
 	Post(mux, "/preview", postCtrl.PreviewPostHandler)
 

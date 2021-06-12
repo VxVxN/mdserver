@@ -8,8 +8,6 @@ import (
 
 	"github.com/VxVxN/mdserver/internal/driver/mongo/posts"
 
-	"github.com/russross/blackfriday"
-
 	"github.com/VxVxN/mdserver/internal/post"
 
 	"github.com/VxVxN/log"
@@ -46,18 +44,22 @@ func (ctrl *Controller) getPosts(w http.ResponseWriter) *e.ErrObject {
 func prepareHTML(dirs []*posts.Directory) string {
 	body := "[<a href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#createDirectoryModal\">Создать директорию</a>]"
 	for _, dir := range dirs {
-		body += "<h3>" + dir.DirName + "</h3>[<a href=\"#\">Создать файл</a>][<a href=\"#\" class=\"deleteDirectory\" data-name=\"" + dir.DirName + "\">Удалить директорию</a>]"
-
-		var mdPosts string
+		createPostBtn := "[<a href=\"#\" class=\"createPost\" data-bs-toggle=\"modal\" data-bs-target=\"#createPostModal\" data-dirname=\"" + dir.DirName + "\">Создать файл</a>]"
+		deletePostBtn := "[<a href=\"#\" class=\"deleteModal\" data-type=\"directory\" data-name=\"" + dir.DirName + "\">Удалить директорию</a>]"
+		body += "<h3>" + dir.DirName + "</h3>" + createPostBtn + deletePostBtn
+		body += "<ul>"
 		for _, file := range dir.Files {
 			dirNameWithoutSpace := strings.Replace(dir.DirName, " ", "+", -1)
 			fileNameWithoutSpace := strings.Replace(file, " ", "+", -1)
 
 			linkToPost := dirNameWithoutSpace + "/" + fileNameWithoutSpace
-
-			mdPosts += "* [" + file + "](/" + linkToPost + ") [[Редактировать](/edit/" + linkToPost + ")] [[Удалить](/delete/" + linkToPost + ")]\n"
+			body += "<li>"
+			body += "<a href=\"/" + linkToPost + "\">" + file + "</a>"
+			body += " [<a href=\"/edit/" + linkToPost + "\">Редактировать</a>]"
+			body += " [<a href=\"#/" + linkToPost + "\" class=\"deleteModal\" data-type=\"file\" data-name=\"" + file + "\" data-dirname=\"" + dir.DirName + "\">Удалить</a>]"
+			body += "</li>"
 		}
-		body += string(blackfriday.MarkdownCommon([]byte(mdPosts)))
+		body += "</ul>"
 	}
 	return body
 }

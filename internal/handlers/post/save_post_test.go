@@ -19,6 +19,7 @@ func TestSavePost(t *testing.T) {
 	glob.WorkDir, err = os.Getwd()
 	require.NoError(t, err)
 	glob.WorkDir = path.Dir(path.Dir(glob.WorkDir))
+	consts.PathToPosts = path.Join(glob.WorkDir, "..", "posts")
 
 	pathToFile := path.Join(glob.WorkDir, "..", "posts", dirName, fileName) + consts.ExtMd
 	pathToDir := path.Join(glob.WorkDir, "..", "posts", dirName)
