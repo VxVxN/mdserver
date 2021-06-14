@@ -3,6 +3,8 @@ package common
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/VxVxN/mdserver/pkg/config"
 
 	"github.com/VxVxN/log"
@@ -17,13 +19,13 @@ type ResponseCheckPassword struct {
 	IsValid bool `json:"valid"`
 }
 
-func (ctrl *Controller) CheckPasswordHandler(w http.ResponseWriter, r *http.Request) {
+func (ctrl *Controller) CheckPasswordHandler(c *gin.Context) {
 	var req RequestCheckPassword
 
-	errObj := tools.UnmarshalRequest(r, &req)
+	errObj := tools.UnmarshalRequest(c, &req)
 	if errObj != nil {
 		log.Error.Printf("Failed to unmarshal request: %v", errObj.Error)
-		errObj.JsonResponse(w)
+		errObj.JsonResponse(c)
 		return
 	}
 
@@ -32,5 +34,5 @@ func (ctrl *Controller) CheckPasswordHandler(w http.ResponseWriter, r *http.Requ
 		isPasswordCorrect = true
 	}
 
-	tools.SuccessResponse(w, ResponseCheckPassword{IsValid: isPasswordCorrect})
+	c.JSON(http.StatusOK, ResponseCheckPassword{IsValid: isPasswordCorrect})
 }

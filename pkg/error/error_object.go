@@ -2,8 +2,9 @@ package error
 
 import (
 	"errors"
-	"net/http"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 type ErrObject struct {
@@ -23,6 +24,9 @@ func NewError(message string, status int, err error) *ErrObject {
 	}
 }
 
-func (errObj *ErrObject) JsonResponse(w http.ResponseWriter) {
-	JsonErrorResponse(w, errObj.Massage, errObj.Status)
+func (errObj *ErrObject) JsonResponse(c *gin.Context) {
+	resp := make(map[string]string)
+	resp["message"] = errObj.Massage
+
+	c.JSON(errObj.Status, resp)
 }

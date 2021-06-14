@@ -6,6 +6,8 @@ import (
 	"os"
 	"path"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/VxVxN/log"
 	"github.com/VxVxN/mdserver/pkg/consts"
 	e "github.com/VxVxN/mdserver/pkg/error"
@@ -16,19 +18,19 @@ type RequestDeleteDirectory struct {
 	DirName string `json:"name"`
 }
 
-func (ctrl *Controller) DeleteDirectoryHandler(w http.ResponseWriter, r *http.Request) {
+func (ctrl *Controller) DeleteDirectoryHandler(c *gin.Context) {
 	var req RequestDeleteDirectory
 
-	errObj := tools.UnmarshalRequest(r, &req)
+	errObj := tools.UnmarshalRequest(c, &req)
 	if errObj != nil {
 		log.Error.Printf("Failed to unmarshal request: %v", errObj.Error)
-		errObj.JsonResponse(w)
+		errObj.JsonResponse(c)
 		return
 	}
 
 	if errObj = ctrl.deleteDirectory(req); errObj != nil {
 		log.Error.Printf("Failed to delete directory: %v", errObj.Error)
-		errObj.JsonResponse(w)
+		errObj.JsonResponse(c)
 		return
 	}
 }

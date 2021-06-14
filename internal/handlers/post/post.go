@@ -6,6 +6,8 @@ import (
 	"path"
 	"strings"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/VxVxN/mdserver/internal/glob"
 	"github.com/VxVxN/mdserver/pkg/consts"
 
@@ -13,36 +15,34 @@ import (
 	e "github.com/VxVxN/mdserver/pkg/error"
 )
 
-func (ctrl *Controller) PostHandler(w http.ResponseWriter, r *http.Request) {
-	if errObj := ctrl.getPost(w, r); errObj != nil {
+func (ctrl *Controller) PostHandler(c *gin.Context) {
+	if errObj := ctrl.getPost(c); errObj != nil {
 		log.Error.Printf("Failed to edit post: %v", errObj.Error)
-		errObj.JsonResponse(w)
+		errObj.JsonResponse(c)
 		return
 	}
 }
 
-func (ctrl *Controller) getPost(w http.ResponseWriter, r *http.Request) *e.ErrObject {
-	postMD := ctrl.getPathToPostMD(r)
+func (ctrl *Controller) getPost(c *gin.Context) *e.ErrObject {
+	postMD := ctrl.getPathToPostMD(c)
 
 	templatePost, status, err := ctrl.posts.Get(postMD, false)
 	if err != nil {
 		err = fmt.Errorf("can't get post: %v, post: %s", err, postMD)
 		return e.NewError("Failed to get post", status, err)
 	}
-	if err = ctrl.postTemplate.ExecuteTemplate(w, "layout", templatePost); err != nil {
+	if err = ctrl.postTemplate.ExecuteTemplate(c.Writer, "layout", templatePost); err != nil {
 		err = fmt.Errorf("can't execute template: %v, post: %s", err, templatePost.Title)
 		return e.NewError("Failed to get post", http.StatusInternalServerError, err)
 	}
 	return nil
 }
 
-func (ctrl *Controller) getPathToPostMD(r *http.Request) string {
-	params := r.URL.Query()
-
-	dir := params.Get(":dir")
+func (ctrl *Controller) getPathToPostMD(c *gin.Context) string {
+	dir := c.Param("dir")
 	dir = strings.Replace(dir, "+", " ", -1)
 
-	file := params.Get(":file")
+	file := c.Param("file")
 	file = strings.Replace(file, "+", " ", -1)
 
 	postMD := path.Join(glob.WorkDir, "..", "posts", dir, file)

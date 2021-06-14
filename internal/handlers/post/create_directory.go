@@ -6,6 +6,8 @@ import (
 	"os"
 	"path"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/VxVxN/log"
 	"github.com/VxVxN/mdserver/pkg/consts"
 	e "github.com/VxVxN/mdserver/pkg/error"
@@ -16,19 +18,19 @@ type RequestCreateDirectory struct {
 	DirName string `json:"name"`
 }
 
-func (ctrl *Controller) CreateDirectoryHandler(w http.ResponseWriter, r *http.Request) {
+func (ctrl *Controller) CreateDirectoryHandler(c *gin.Context) {
 	var req RequestCreateDirectory
 
-	errObj := tools.UnmarshalRequest(r, &req)
+	errObj := tools.UnmarshalRequest(c, &req)
 	if errObj != nil {
 		log.Error.Printf("Failed to unmarshal request: %v", errObj.Error)
-		errObj.JsonResponse(w)
+		errObj.JsonResponse(c)
 		return
 	}
 
 	if errObj = ctrl.createDirectory(req); errObj != nil {
 		log.Error.Printf("Failed to create directory: %v", errObj.Error)
-		errObj.JsonResponse(w)
+		errObj.JsonResponse(c)
 		return
 	}
 }

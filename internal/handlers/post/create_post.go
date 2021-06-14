@@ -6,6 +6,8 @@ import (
 	"os"
 	"path"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/VxVxN/log"
 	"github.com/VxVxN/mdserver/pkg/consts"
 	e "github.com/VxVxN/mdserver/pkg/error"
@@ -17,19 +19,19 @@ type RequestCreatePost struct {
 	FileName string `json:"file_name"`
 }
 
-func (ctrl *Controller) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
+func (ctrl *Controller) CreatePostHandler(c *gin.Context) {
 	var req RequestCreatePost
 
-	errObj := tools.UnmarshalRequest(r, &req)
+	errObj := tools.UnmarshalRequest(c, &req)
 	if errObj != nil {
 		log.Error.Printf("Failed to unmarshal request: %v", errObj.Error)
-		errObj.JsonResponse(w)
+		errObj.JsonResponse(c)
 		return
 	}
 
 	if errObj = ctrl.createPost(req); errObj != nil {
 		log.Error.Printf("Failed to create post: %v", errObj.Error)
-		errObj.JsonResponse(w)
+		errObj.JsonResponse(c)
 		return
 	}
 }

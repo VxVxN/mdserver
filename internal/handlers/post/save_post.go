@@ -6,6 +6,8 @@ import (
 	"path"
 	"strings"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/VxVxN/log"
 	"github.com/VxVxN/mdserver/pkg/consts"
 	e "github.com/VxVxN/mdserver/pkg/error"
@@ -18,19 +20,19 @@ type RequestSave struct {
 	Text     string `json:"text"`
 }
 
-func (ctrl *Controller) SavePostHandler(w http.ResponseWriter, r *http.Request) {
+func (ctrl *Controller) SavePostHandler(c *gin.Context) {
 	var req RequestSave
 
-	errObj := tools.UnmarshalRequest(r, &req)
+	errObj := tools.UnmarshalRequest(c, &req)
 	if errObj != nil {
 		log.Error.Printf("Failed to unmarshal request: %v", errObj.Error)
-		errObj.JsonResponse(w)
+		errObj.JsonResponse(c)
 		return
 	}
 
 	if errObj = SavePost(req.DirName, req.FileName, req.Text, false); errObj != nil {
 		log.Error.Printf("Failed to save post: %v", errObj.Error)
-		errObj.JsonResponse(w)
+		errObj.JsonResponse(c)
 		return
 	}
 }

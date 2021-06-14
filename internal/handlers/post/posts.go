@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/VxVxN/mdserver/internal/driver/mongo/posts"
 
 	"github.com/VxVxN/mdserver/internal/post"
@@ -14,15 +16,15 @@ import (
 	e "github.com/VxVxN/mdserver/pkg/error"
 )
 
-func (ctrl *Controller) PostsHandler(w http.ResponseWriter, r *http.Request) {
-	if errObj := ctrl.getPosts(w); errObj != nil {
+func (ctrl *Controller) PostsHandler(c *gin.Context) {
+	if errObj := ctrl.getPosts(c); errObj != nil {
 		log.Error.Printf("Failed to edit post: %v", errObj.Error)
-		errObj.JsonResponse(w)
+		errObj.JsonResponse(c)
 		return
 	}
 }
 
-func (ctrl *Controller) getPosts(w http.ResponseWriter) *e.ErrObject {
+func (ctrl *Controller) getPosts(c *gin.Context) *e.ErrObject {
 	dirs, err := ctrl.mongoPosts.GetList()
 	if err != nil {
 		err = fmt.Errorf("can't get posts: %v", err)
@@ -31,7 +33,7 @@ func (ctrl *Controller) getPosts(w http.ResponseWriter) *e.ErrObject {
 
 	body := prepareHTML(dirs)
 
-	if err = ctrl.indexTemplate.ExecuteTemplate(w, "layout", post.TemplatePost{
+	if err = ctrl.indexTemplate.ExecuteTemplate(c.Writer, "layout", post.TemplatePost{
 		Title: "Записки",
 		Body:  template.HTML(body),
 	}); err != nil {

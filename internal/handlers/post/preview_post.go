@@ -3,6 +3,8 @@ package post
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	e "github.com/VxVxN/mdserver/pkg/error"
 
 	"github.com/russross/blackfriday"
@@ -15,23 +17,23 @@ type RequestPreview struct {
 	Text string `json:"text"`
 }
 
-func (ctrl *Controller) PreviewPostHandler(w http.ResponseWriter, r *http.Request) {
+func (ctrl *Controller) PreviewPostHandler(c *gin.Context) {
 	var req RequestPreview
 
-	errObj := tools.UnmarshalRequest(r, &req)
+	errObj := tools.UnmarshalRequest(c, &req)
 	if errObj != nil {
 		log.Error.Printf("Failed to unmarshal request: %v", errObj.Error)
-		errObj.JsonResponse(w)
+		errObj.JsonResponse(c)
 		return
 	}
 
 	preview := blackfriday.MarkdownCommon([]byte(req.Text))
 
-	_, err := w.Write(preview)
+	_, err := c.Writer.Write(preview)
 	if err != nil {
 		log.Error.Printf("Failed to write response: %v", err)
 		errObj = e.NewError("Failed to write response", http.StatusInternalServerError, err)
-		errObj.JsonResponse(w)
+		errObj.JsonResponse(c)
 		return
 	}
 }

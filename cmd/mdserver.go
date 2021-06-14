@@ -3,24 +3,29 @@ package main
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
 	"path"
-	"strings"
 	"time"
+
+	"github.com/VxVxN/mdserver/pkg/consts"
+
+	"github.com/VxVxN/mdserver/internal/handlers/common"
 
 	"github.com/VxVxN/log"
 	"github.com/VxVxN/mdserver/internal/glob"
-	"github.com/VxVxN/mdserver/internal/handlers/common"
 	"github.com/VxVxN/mdserver/internal/handlers/post"
 	"github.com/VxVxN/mdserver/pkg/config"
-	"github.com/bmizerany/pat"
+	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type mdServer struct {
+	router      *gin.Engine
 	MongoClient *mongo.Client
+
+	postCtrl   *post.Controller
+	commonCtrl *common.Controller
 }
 
 func main() {
@@ -30,48 +35,35 @@ func main() {
 	}
 	defer server.Stop()
 
-	fs := noDirListing(http.FileServer(http.Dir(glob.WorkDir + "/../public/static")))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	server.router.Static("/static/", glob.WorkDir+"/../public/static")
+	server.router.StaticFile("/favicon.ico", glob.WorkDir+"/../public/static/images/favicon.ico")
 
-	uploads := noDirListing(http.FileServer(http.Dir("./public/uploads")))
-	http.Handle("/uploads/", http.StripPrefix("/uploads/", uploads))
+	server.router.LoadHTMLGlob(consts.PathToTemplates + "/*")
 
-	postCtrl := post.NewController(server.MongoClient)
-	commonCtrl := common.NewController()
+	server.router.POST("/delete_post", server.postCtrl.DeletePostHandler)
+	server.router.POST("/create_post", server.postCtrl.CreatePostHandler)
+	server.router.POST("/save_post", server.postCtrl.SavePostHandler)
+	server.router.POST("/preview", server.postCtrl.PreviewPostHandler)
 
-	mux := pat.New()
+	server.router.POST("/create_directory", server.postCtrl.CreateDirectoryHandler)
+	server.router.POST("/delete_directory", server.postCtrl.DeleteDirectoryHandler)
 
-	// static
-	mux.Get("/favicon.ico", http.HandlerFunc(faviconHandler))
+	server.router.POST("/check_password", server.commonCtrl.CheckPasswordHandler)
 
-	// ajax
-	Post(mux, "/delete_post", postCtrl.DeletePostHandler)
-	Post(mux, "/create_post", postCtrl.CreatePostHandler)
-	Post(mux, "/save_post", postCtrl.SavePostHandler)
-	Post(mux, "/preview", postCtrl.PreviewPostHandler)
+	server.router.GET("/edit/:dir/:file", server.postCtrl.EditPostHandler)
+	server.router.GET("/:dir/:file", server.postCtrl.PostHandler)
 
-	Post(mux, "/create_directory", postCtrl.CreateDirectoryHandler)
-	Post(mux, "/delete_directory", postCtrl.DeleteDirectoryHandler)
-
-	Post(mux, "/check_password", commonCtrl.CheckPasswordHandler)
-
-	Get(mux, "/edit/:dir/:file", postCtrl.EditPostHandler)
-	Get(mux, "/:dir/:file", postCtrl.PostHandler)
-
-	mux.Get("/", http.HandlerFunc(postCtrl.PostsHandler))
-
-	http.Handle("/", mux)
+	server.router.GET("/", server.postCtrl.PostsHandler)
 
 	listen := config.Cfg.Listen
 	log.Info.Printf("Listening %s", listen)
-
-	if err = http.ListenAndServe(listen, nil); err != nil {
-		log.Fatal.Printf("Failed to listen and serve: %v, address: %s", err, listen)
+	if err = server.router.Run(listen); err != nil {
+		log.Fatal.Printf("Failed to run router: %v", err)
 	}
 }
 
 func InitServer() (*mdServer, error) {
-	var server mdServer
+	server := mdServer{router: gin.Default()}
 
 	pathConfig := path.Join(glob.WorkDir, "..", "mdserver.yaml")
 	err := config.InitConfig(pathConfig)
@@ -95,6 +87,9 @@ func InitServer() (*mdServer, error) {
 
 	server.MongoClient = client
 
+	server.postCtrl = post.NewController(server.MongoClient)
+	server.commonCtrl = common.NewController()
+
 	return &server, nil
 }
 
@@ -107,31 +102,6 @@ func (server *mdServer) Stop() {
 	}
 }
 
-func Post(mux *pat.PatternServeMux, route string, handler func(http.ResponseWriter, *http.Request)) {
-	mux.Post(route, http.HandlerFunc(handler))
-	mux.Post(route+"/", http.HandlerFunc(handler))
-}
-
-func Get(mux *pat.PatternServeMux, route string, handler func(http.ResponseWriter, *http.Request)) {
-	mux.Get(route, http.HandlerFunc(handler))
-	mux.Get(route+"/", http.HandlerFunc(handler))
-}
-
-// обертка для http.FileServer, чтобы она не выдавала список файлов
-// например, если открыть http://127.0.0.1:3000/static/,
-// то будет видно список файлов внутри каталога.
-// noDirListing - вернет 404 ошибку в этом случае.
-func noDirListing(h http.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasSuffix(r.URL.Path, "/") || r.URL.Path == "" {
-			log.Error.Printf("The path not found: %s", r.URL.Path)
-			http.NotFound(w, r)
-			return
-		}
-		h.ServeHTTP(w, r)
-	}
-}
-
 func getLevelLog(lvlLog config.LVLLog) log.LevelLog {
 	switch lvlLog {
 	case config.DebugLog:
@@ -140,8 +110,4 @@ func getLevelLog(lvlLog config.LVLLog) log.LevelLog {
 		return log.TraceLog
 	}
 	return log.CommonLog
-}
-
-func faviconHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, glob.WorkDir+"/../public/static/images/favicon.ico")
 }
