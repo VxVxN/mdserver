@@ -1,0 +1,18 @@
+version: "3.5"
+services:
+  web:
+    container_name: mdserver
+    build: .
+    ports:
+      - "80:80"
+    depends_on:
+      - mongodb
+    volumes:
+      - ./posts:/app/posts
+  mongodb:
+    image: andresvidal/rpi3-mongodb3
+    restart: always
+    container_name: 'mongo'
+    volumes:
+    - /data/db:/data/db
+    - /data/configdb:/data/configdb

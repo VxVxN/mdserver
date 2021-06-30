@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	slog "log"
 	"os"
 	"path"
 	"time"
@@ -31,12 +32,12 @@ type mdServer struct {
 func main() {
 	server, err := InitServer()
 	if err != nil {
-		log.Fatal.Printf("Failed to init md server: %v", err)
+		slog.Fatal("Failed to init md server", err)
 	}
 	defer server.Stop()
 
-	server.router.Static("/static/", glob.WorkDir+"/../public/static")
-	server.router.StaticFile("/favicon.ico", glob.WorkDir+"/../public/static/images/favicon.ico")
+	server.router.Static("/static/", glob.WorkDir+"/public/static")
+	server.router.StaticFile("/favicon.ico", glob.WorkDir+"/public/static/images/favicon.ico")
 
 	server.router.LoadHTMLGlob(consts.PathToTemplates + "/*")
 
@@ -65,13 +66,13 @@ func main() {
 func InitServer() (*mdServer, error) {
 	server := mdServer{router: gin.Default()}
 
-	pathConfig := path.Join(glob.WorkDir, "..", "mdserver.yaml")
+	pathConfig := path.Join(glob.WorkDir, "mdserver.yaml")
 	err := config.InitConfig(pathConfig)
 	if err != nil {
 		return nil, fmt.Errorf("can't read config: %v, path: %s", err, pathConfig)
 	}
 
-	pathLogs := path.Join(glob.WorkDir, "..", "logs/md_server.log")
+	pathLogs := path.Join(glob.WorkDir, "logs/md_server.log")
 
 	if err = log.Init(pathLogs, getLevelLog(config.Cfg.LevelLog), false); err != nil {
 		return nil, fmt.Errorf("can't init log: %v, path: %s", err, pathLogs)
@@ -79,7 +80,7 @@ func InitServer() (*mdServer, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://mongo:27017"))
 	if err != nil {
 		log.Fatal.Printf("Failed to connect to mongo db: %v", err)
 		return nil, fmt.Errorf("can't connect to mongo db: %v", err)

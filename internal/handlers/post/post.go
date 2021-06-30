@@ -8,7 +8,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/VxVxN/mdserver/internal/glob"
 	"github.com/VxVxN/mdserver/pkg/consts"
 
 	"github.com/VxVxN/log"
@@ -45,7 +44,7 @@ func (ctrl *Controller) getPathToPostMD(c *gin.Context) string {
 	file := c.Param("file")
 	file = strings.Replace(file, "+", " ", -1)
 
-	postMD := path.Join(glob.WorkDir, "..", "posts", dir, file)
+	postMD := path.Join(consts.PathToPosts, dir, file)
 	postMD += consts.ExtMd
 	return postMD
 }

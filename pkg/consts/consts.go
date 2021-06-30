@@ -11,6 +11,6 @@ const (
 )
 
 var (
-	PathToTemplates = path.Join(glob.WorkDir, "..", "templates")
-	PathToPosts     = path.Join(glob.WorkDir, "..", "posts")
+	PathToTemplates = path.Join(glob.WorkDir, "templates")
+	PathToPosts     = path.Join(glob.WorkDir, "posts")
 )
