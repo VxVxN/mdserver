@@ -11,18 +11,18 @@
       <h1>{{.Title}}</h1>
       <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
-          <button class="nav-link active flex-grow-1" id="editingTab" data-bs-toggle="tab" data-bs-target="#editing" type="button" role="tab" aria-controls="home" aria-selected="true">Редактировать</button>
+          <button class="nav-link active flex-grow-1" id="editingTab" data-bs-toggle="tab" data-bs-target="#editing" type="button" role="tab" aria-controls="home" aria-selected="true">Edit</button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="previewTab" data-bs-toggle="tab" data-bs-target="#preview" type="button" role="tab" aria-controls="profile" aria-selected="false">Превью</button>
+          <button class="nav-link" id="previewTab" data-bs-toggle="tab" data-bs-target="#preview" type="button" role="tab" aria-controls="profile" aria-selected="false">Preview</button>
         </li>
       </ul>
       <div class="tab-content flex-grow-1" id="myTabContent">
         <div class="tab-pane fade show active h-100 d-flex flex-column" id="editing" role="tabpanel" aria-labelledby="editing-tab">
           <textarea id="postText" class="p-2 flex-grow-1 mx-3">{{.Body}}</textarea>
           <div class="align-self-center m-3">
-            <a id="cancelSavePost" class="btn btn-secondary" style="width: 120px" type="button" href="\">Отмена</a>
-            <button id="savePost" class="btn btn-primary me-2" style="width: 120px" type="button">Сохранить</button>
+            <a id="cancelSavePost" class="btn btn-secondary" style="width: 120px" type="button" href="\">Cancel</a>
+            <button id="savePost" class="btn btn-primary me-2" style="width: 120px" type="button">Save</button>
           </div>
         </div>
         <div class="tab-pane fade" id="preview" role="tabpanel" aria-labelledby="previewTab">

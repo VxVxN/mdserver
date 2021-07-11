@@ -14,7 +14,7 @@ document.getElementById("signInBtn").onclick = function () {
     document.getElementById("createPostName").value = '';
 
     if (password === "") {
-        errorDiv.innerText = "Пароль не может быть пустым.";
+        errorDiv.innerText = "The password cannot be empty";
         passwordInput.classList.add("is-invalid");
         return;
     }
@@ -26,7 +26,7 @@ document.getElementById("signInBtn").onclick = function () {
     }
 
     const errorCallback = function () {
-        errorDiv.innerText = "Неправильный пароль.";
+        errorDiv.innerText = "Incorrect password";
         passwordInput.classList.add("is-invalid");
         return false;
     }
@@ -62,11 +62,11 @@ document.getElementById("cancelPostModalBtn").onclick = function () {
 document.addEventListener('click',function(e){
     if (e.target.classList.contains('deleteModal')) {
         if (e.target.dataset.type === 'directory') {
-            document.getElementById("deleteModalLabel").innerText = 'Вы уверены что хотите удалить директорию ' + e.target.dataset.name + '?';
-            document.getElementById("deleteModalTitle").innerText = "Удалить директорию";
+            document.getElementById("deleteModalLabel").innerText = 'Are you sure you want to delete the directory ' + e.target.dataset.name + '?';
+            document.getElementById("deleteModalTitle").innerText = "Delete the directory";
         } else {
-            document.getElementById("deleteModalLabel").innerText = 'Вы уверены что хотите удалить файл ' + e.target.dataset.name + '?';
-            document.getElementById("deleteModalTitle").innerText = "Удалить файл";
+            document.getElementById("deleteModalLabel").innerText = 'Are you sure you want to delete the file ' + e.target.dataset.name + '?';
+            document.getElementById("deleteModalTitle").innerText = "Delete the file";
 
             document.getElementById("deleteModalBtn").dataset.dirname = e.target.dataset.dirname;
         }

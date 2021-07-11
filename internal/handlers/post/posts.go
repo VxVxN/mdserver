@@ -35,7 +35,7 @@ func (ctrl *Controller) getPosts(c *gin.Context) *e.ErrObject {
 	body := prepareHTML(c, dirs)
 
 	if err = ctrl.indexTemplate.ExecuteTemplate(c.Writer, "layout", post.TemplatePost{
-		Title: "Записки",
+		Title: "Notes",
 		Body:  template.HTML(body),
 	}); err != nil {
 		err = fmt.Errorf("can't execute template: %v", err)
@@ -49,10 +49,10 @@ func prepareHTML(c *gin.Context, dirs []*posts.Directory) string {
 	var body string
 	_, err := tools.CheckCookie(c)
 	if err == nil {
-		body = "[<a href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#createDirectoryModal\">Создать директорию</a>]"
+		body = "[<a href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#createDirectoryModal\">Create directory</a>]"
 		for _, dir := range dirs {
-			createPostBtn := "[<a href=\"#\" class=\"createPost\" data-bs-toggle=\"modal\" data-bs-target=\"#createPostModal\" data-dirname=\"" + dir.DirName + "\">Создать файл</a>]"
-			deletePostBtn := "[<a href=\"#\" class=\"deleteModal\" data-type=\"directory\" data-name=\"" + dir.DirName + "\">Удалить директорию</a>]"
+			createPostBtn := "[<a href=\"#\" class=\"createPost\" data-bs-toggle=\"modal\" data-bs-target=\"#createPostModal\" data-dirname=\"" + dir.DirName + "\">Create file</a>]"
+			deletePostBtn := "[<a href=\"#\" class=\"deleteModal\" data-type=\"directory\" data-name=\"" + dir.DirName + "\">Delete directory</a>]"
 			body += "<h3>" + dir.DirName + "</h3>" + createPostBtn + deletePostBtn
 			body += "<ul>"
 			for _, file := range dir.Files {
@@ -62,8 +62,8 @@ func prepareHTML(c *gin.Context, dirs []*posts.Directory) string {
 				linkToPost := dirNameWithoutSpace + "/" + fileNameWithoutSpace
 				body += "<li>"
 				body += "<a href=\"/" + linkToPost + "\">" + file + "</a>"
-				body += " [<a href=\"/edit/" + linkToPost + "\">Редактировать</a>]"
-				body += " [<a href=\"#/" + linkToPost + "\" class=\"deleteModal\" data-type=\"file\" data-name=\"" + file + "\" data-dirname=\"" + dir.DirName + "\">Удалить</a>]"
+				body += " [<a href=\"/edit/" + linkToPost + "\">Edit</a>]"
+				body += " [<a href=\"#/" + linkToPost + "\" class=\"deleteModal\" data-type=\"file\" data-name=\"" + file + "\" data-dirname=\"" + dir.DirName + "\">Delete</a>]"
 				body += "</li>"
 			}
 			body += "</ul>"
