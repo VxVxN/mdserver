@@ -1,12 +1,12 @@
 package tools
 
 import (
-	"encoding/json"
+	"errors"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"github.com/VxVxN/mdserver/internal/glob"
 
-	"github.com/VxVxN/log"
+	"github.com/gin-gonic/gin"
 
 	e "github.com/VxVxN/mdserver/pkg/error"
 )
@@ -19,16 +19,17 @@ func UnmarshalRequest(c *gin.Context, reqStruct interface{}) *e.ErrObject {
 	return nil
 }
 
-func SuccessResponse(w http.ResponseWriter, response interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+func CheckCookie(c *gin.Context) (int, error) {
+	cookie, err := c.Cookie("session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			return http.StatusUnauthorized, err
+		}
+		return http.StatusBadRequest, err
+	}
 
-	jsonResp, err := json.Marshal(response)
-	if err != nil {
-		log.Error.Printf("Failed to unmarshal request: %v", err)
+	if cookie != glob.SessionToken {
+		return http.StatusUnauthorized, errors.New("unauthorized")
 	}
-	_, err = w.Write(jsonResp)
-	if err != nil {
-		log.Error.Printf("Failed to write json response: %v", err)
-	}
+	return 0, nil
 }

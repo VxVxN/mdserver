@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/VxVxN/mdserver/pkg/tools"
 	"github.com/gin-gonic/gin"
 
 	"github.com/VxVxN/mdserver/internal/driver/mongo/posts"
@@ -31,7 +32,7 @@ func (ctrl *Controller) getPosts(c *gin.Context) *e.ErrObject {
 		return e.NewError("Failed to get posts", http.StatusInternalServerError, err)
 	}
 
-	body := prepareHTML(dirs)
+	body := prepareHTML(c, dirs)
 
 	if err = ctrl.indexTemplate.ExecuteTemplate(c.Writer, "layout", post.TemplatePost{
 		Title: "Записки",
@@ -43,25 +44,31 @@ func (ctrl *Controller) getPosts(c *gin.Context) *e.ErrObject {
 	return nil
 }
 
-func prepareHTML(dirs []*posts.Directory) string {
-	body := "[<a href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#createDirectoryModal\">Создать директорию</a>]"
-	for _, dir := range dirs {
-		createPostBtn := "[<a href=\"#\" class=\"createPost\" data-bs-toggle=\"modal\" data-bs-target=\"#createPostModal\" data-dirname=\"" + dir.DirName + "\">Создать файл</a>]"
-		deletePostBtn := "[<a href=\"#\" class=\"deleteModal\" data-type=\"directory\" data-name=\"" + dir.DirName + "\">Удалить директорию</a>]"
-		body += "<h3>" + dir.DirName + "</h3>" + createPostBtn + deletePostBtn
-		body += "<ul>"
-		for _, file := range dir.Files {
-			dirNameWithoutSpace := strings.Replace(dir.DirName, " ", "+", -1)
-			fileNameWithoutSpace := strings.Replace(file, " ", "+", -1)
+// TODO: transfer this to front
+func prepareHTML(c *gin.Context, dirs []*posts.Directory) string {
+	var body string
+	_, err := tools.CheckCookie(c)
+	if err == nil {
+		body = "[<a href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#createDirectoryModal\">Создать директорию</a>]"
+		for _, dir := range dirs {
+			createPostBtn := "[<a href=\"#\" class=\"createPost\" data-bs-toggle=\"modal\" data-bs-target=\"#createPostModal\" data-dirname=\"" + dir.DirName + "\">Создать файл</a>]"
+			deletePostBtn := "[<a href=\"#\" class=\"deleteModal\" data-type=\"directory\" data-name=\"" + dir.DirName + "\">Удалить директорию</a>]"
+			body += "<h3>" + dir.DirName + "</h3>" + createPostBtn + deletePostBtn
+			body += "<ul>"
+			for _, file := range dir.Files {
+				dirNameWithoutSpace := strings.Replace(dir.DirName, " ", "+", -1)
+				fileNameWithoutSpace := strings.Replace(file, " ", "+", -1)
 
-			linkToPost := dirNameWithoutSpace + "/" + fileNameWithoutSpace
-			body += "<li>"
-			body += "<a href=\"/" + linkToPost + "\">" + file + "</a>"
-			body += " [<a href=\"/edit/" + linkToPost + "\">Редактировать</a>]"
-			body += " [<a href=\"#/" + linkToPost + "\" class=\"deleteModal\" data-type=\"file\" data-name=\"" + file + "\" data-dirname=\"" + dir.DirName + "\">Удалить</a>]"
-			body += "</li>"
+				linkToPost := dirNameWithoutSpace + "/" + fileNameWithoutSpace
+				body += "<li>"
+				body += "<a href=\"/" + linkToPost + "\">" + file + "</a>"
+				body += " [<a href=\"/edit/" + linkToPost + "\">Редактировать</a>]"
+				body += " [<a href=\"#/" + linkToPost + "\" class=\"deleteModal\" data-type=\"file\" data-name=\"" + file + "\" data-dirname=\"" + dir.DirName + "\">Удалить</a>]"
+				body += "</li>"
+			}
+			body += "</ul>"
 		}
-		body += "</ul>"
 	}
+
 	return body
 }

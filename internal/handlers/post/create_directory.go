@@ -15,7 +15,7 @@ import (
 )
 
 type RequestCreateDirectory struct {
-	DirName string `json:"name"`
+	DirName string `json:"name" binding:"required"`
 }
 
 func (ctrl *Controller) CreateDirectoryHandler(c *gin.Context) {

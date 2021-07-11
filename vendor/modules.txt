@@ -45,6 +45,8 @@ github.com/go-stack/stack
 github.com/golang/protobuf/proto
 # github.com/golang/snappy v0.0.1
 github.com/golang/snappy
+# github.com/google/uuid v1.2.0
+## explicit
 # github.com/jmespath/go-jmespath v0.4.0
 github.com/jmespath/go-jmespath
 # github.com/json-iterator/go v1.1.11
@@ -75,6 +77,9 @@ github.com/pmezard/go-difflib/difflib
 # github.com/russross/blackfriday v1.6.0
 ## explicit
 github.com/russross/blackfriday
+# github.com/satori/go.uuid v1.2.0
+## explicit
+github.com/satori/go.uuid
 # github.com/stretchr/testify v1.7.0
 ## explicit
 github.com/stretchr/testify/assert

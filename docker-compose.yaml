@@ -4,7 +4,7 @@ services:
     container_name: mdserver
     build: .
     ports:
-      - "80:80"
+      - "443:443"
     depends_on:
       - mongodb
     volumes:

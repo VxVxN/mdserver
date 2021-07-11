@@ -15,7 +15,7 @@ import (
 )
 
 type RequestDeleteDirectory struct {
-	DirName string `json:"name"`
+	DirName string `json:"name" binding:"required"`
 }
 
 func (ctrl *Controller) DeleteDirectoryHandler(c *gin.Context) {

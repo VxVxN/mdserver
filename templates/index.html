@@ -10,6 +10,31 @@
       <div class="col-md-8 col-md-offset-2">
          <h1>{{.Title}}</h1>
          {{.Body}}
+         <!-- sign in modal -->
+         <div class="modal fade" id="signInModal" tabindex="-1" aria-labelledby="signInModal" aria-hidden="true">
+            <div class="modal-dialog">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title">Авторизация</h5>
+                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                     <form>
+                        <div class="mb-3 has-validation">
+                           <label for="password" class="col-form-label">Пароль:</label>
+                           <input type="password" class="form-control" id="password">
+                           <div class="invalid-feedback" id="errorDiv"></div>
+                        </div>
+                     </form>
+                  </div>
+                  <div class="modal-footer">
+                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancelSignIn">Отмена</button>
+                     <button type="button" class="btn btn-primary" id="signInBtn">Войти</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!-- end sign in modal -->
          <!-- create directory modal -->
          <div class="modal fade" id="createDirectoryModal" tabindex="-1" aria-labelledby="createDirectoryModal" aria-hidden="true">
             <div class="modal-dialog">

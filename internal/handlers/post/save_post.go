@@ -15,9 +15,9 @@ import (
 )
 
 type RequestSave struct {
-	DirName  string `json:"dir_name"`
-	FileName string `json:"file_name"`
-	Text     string `json:"text"`
+	DirName  string `json:"dir_name" binding:"required"`
+	FileName string `json:"file_name" binding:"required"`
+	Text     string `json:"text" binding:"required"`
 }
 
 func (ctrl *Controller) SavePostHandler(c *gin.Context) {

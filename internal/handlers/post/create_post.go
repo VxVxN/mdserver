@@ -15,8 +15,8 @@ import (
 )
 
 type RequestCreatePost struct {
-	DirName  string `json:"dir_name"`
-	FileName string `json:"file_name"`
+	DirName  string `json:"dir_name" binding:"required"`
+	FileName string `json:"file_name" binding:"required"`
 }
 
 func (ctrl *Controller) CreatePostHandler(c *gin.Context) {

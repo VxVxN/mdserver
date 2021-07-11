@@ -14,7 +14,7 @@ import (
 )
 
 type RequestPreview struct {
-	Text string `json:"text"`
+	Text string `json:"text" binding:"required"`
 }
 
 func (ctrl *Controller) PreviewPostHandler(c *gin.Context) {

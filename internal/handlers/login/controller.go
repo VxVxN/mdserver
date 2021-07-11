@@ -1,4 +1,4 @@
-package common
+package login
 
 import (
 	e "github.com/VxVxN/mdserver/pkg/error"

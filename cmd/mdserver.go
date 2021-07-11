@@ -4,13 +4,18 @@ import (
 	"context"
 	"fmt"
 	slog "log"
+	"net/http"
 	"os"
 	"path"
 	"time"
 
-	"github.com/VxVxN/mdserver/pkg/consts"
+	"github.com/VxVxN/mdserver/pkg/tools"
 
-	"github.com/VxVxN/mdserver/internal/handlers/common"
+	e "github.com/VxVxN/mdserver/pkg/error"
+
+	"github.com/VxVxN/mdserver/internal/handlers/login"
+
+	"github.com/VxVxN/mdserver/pkg/consts"
 
 	"github.com/VxVxN/log"
 	"github.com/VxVxN/mdserver/internal/glob"
@@ -25,8 +30,8 @@ type mdServer struct {
 	router      *gin.Engine
 	MongoClient *mongo.Client
 
-	postCtrl   *post.Controller
-	commonCtrl *common.Controller
+	postCtrl  *post.Controller
+	loginCtrl *login.Controller
 }
 
 func main() {
@@ -41,24 +46,28 @@ func main() {
 
 	server.router.LoadHTMLGlob(consts.PathToTemplates + "/*")
 
-	server.router.POST("/delete_post", server.postCtrl.DeletePostHandler)
-	server.router.POST("/create_post", server.postCtrl.CreatePostHandler)
-	server.router.POST("/save_post", server.postCtrl.SavePostHandler)
-	server.router.POST("/preview", server.postCtrl.PreviewPostHandler)
+	server.router.POST("/sign_in", server.loginCtrl.SignIn)
 
-	server.router.POST("/create_directory", server.postCtrl.CreateDirectoryHandler)
-	server.router.POST("/delete_directory", server.postCtrl.DeleteDirectoryHandler)
+	authRouter := server.router.Group("")
+	authRouter.Use(authMiddleware())
+	{
+		authRouter.POST("/delete_post", server.postCtrl.DeletePostHandler)
+		authRouter.POST("/create_post", server.postCtrl.CreatePostHandler)
+		authRouter.POST("/save_post", server.postCtrl.SavePostHandler)
+		authRouter.POST("/preview", server.postCtrl.PreviewPostHandler)
 
-	server.router.POST("/check_password", server.commonCtrl.CheckPasswordHandler)
+		authRouter.POST("/create_directory", server.postCtrl.CreateDirectoryHandler)
+		authRouter.POST("/delete_directory", server.postCtrl.DeleteDirectoryHandler)
 
-	server.router.GET("/edit/:dir/:file", server.postCtrl.EditPostHandler)
-	server.router.GET("/:dir/:file", server.postCtrl.PostHandler)
+		authRouter.GET("/edit/:dir/:file", server.postCtrl.EditPostHandler)
+		authRouter.GET("/:dir/:file", server.postCtrl.PostHandler)
+	}
 
 	server.router.GET("/", server.postCtrl.PostsHandler)
 
 	listen := config.Cfg.Listen
 	log.Info.Printf("Listening %s", listen)
-	if err = server.router.Run(listen); err != nil {
+	if err = server.router.RunTLS(listen, "https-server.crt", "https-server.key"); err != nil {
 		log.Fatal.Printf("Failed to run router: %v", err)
 	}
 }
@@ -89,7 +98,7 @@ func InitServer() (*mdServer, error) {
 	server.MongoClient = client
 
 	server.postCtrl = post.NewController(server.MongoClient)
-	server.commonCtrl = common.NewController()
+	server.loginCtrl = login.NewController()
 
 	return &server, nil
 }
@@ -111,4 +120,18 @@ func getLevelLog(lvlLog config.LVLLog) log.LevelLog {
 		return log.TraceLog
 	}
 	return log.CommonLog
+}
+
+func authMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		status, err := tools.CheckCookie(c)
+		if err != nil {
+			if status == http.StatusUnauthorized {
+				c.HTML(http.StatusUnauthorized, "unauthorized.html", nil)
+			} else {
+				e.NewError("Bad Request", http.StatusBadRequest, err).JsonResponse(c)
+			}
+			c.Abort()
+		}
+	}
 }

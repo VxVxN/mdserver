@@ -1,6 +1,39 @@
-// const container = document.getElementById("createDirectoryModal");
-// const modal = new bootstrap.Modal(container);
-// modal.hide();
+const container = document.getElementById('signInModal');
+const signInModal = new bootstrap.Modal(container);
+
+document.getElementById("signIn").onclick = function () {
+    document.getElementById("password").classList.remove("is-invalid");
+    signInModal.show();
+};
+
+document.getElementById("signInBtn").onclick = function () {
+    const passwordInput = document.getElementById("password");
+    const errorDiv = document.getElementById("errorDiv");
+
+    const password = passwordInput.value;
+    document.getElementById("createPostName").value = '';
+
+    if (password === "") {
+        errorDiv.innerText = "Пароль не может быть пустым.";
+        passwordInput.classList.add("is-invalid");
+        return;
+    }
+
+    const successCallback = function () {
+        signInModal.hide();
+        window.location.href = "/";
+        return false;
+    }
+
+    const errorCallback = function () {
+        errorDiv.innerText = "Неправильный пароль.";
+        passwordInput.classList.add("is-invalid");
+        return false;
+    }
+
+    const data = {password:password};
+    sendRequest("/sign_in", data, successCallback.bind(this, window), errorCallback);
+};
 
 document.getElementById("createDirectory").onclick = function () {
     const directoryName = document.getElementById("directoryName").value;
