@@ -5,8 +5,7 @@ import (
 )
 
 var (
-	WorkDir      string
-	SessionToken string // TODO: Redo it
+	WorkDir string
 )
 
 func init() {

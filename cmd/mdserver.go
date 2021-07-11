@@ -9,6 +9,8 @@ import (
 	"path"
 	"time"
 
+	"github.com/VxVxN/mdserver/internal/driver/mongo/sessions"
+
 	"github.com/VxVxN/mdserver/pkg/tools"
 
 	e "github.com/VxVxN/mdserver/pkg/error"
@@ -32,6 +34,8 @@ type mdServer struct {
 
 	postCtrl  *post.Controller
 	loginCtrl *login.Controller
+
+	mongoSessions *sessions.MongoSessions
 }
 
 func main() {
@@ -47,9 +51,10 @@ func main() {
 	server.router.LoadHTMLGlob(consts.PathToTemplates + "/*")
 
 	server.router.POST("/sign_in", server.loginCtrl.SignIn)
+	server.router.POST("/log_out", server.loginCtrl.LogOut)
 
 	authRouter := server.router.Group("")
-	authRouter.Use(authMiddleware())
+	authRouter.Use(server.authMiddleware())
 	{
 		authRouter.POST("/delete_post", server.postCtrl.DeletePostHandler)
 		authRouter.POST("/create_post", server.postCtrl.CreatePostHandler)
@@ -98,7 +103,9 @@ func InitServer() (*mdServer, error) {
 	server.MongoClient = client
 
 	server.postCtrl = post.NewController(server.MongoClient)
-	server.loginCtrl = login.NewController()
+	server.loginCtrl = login.NewController(server.MongoClient)
+
+	server.mongoSessions = sessions.Init(server.MongoClient)
 
 	return &server, nil
 }
@@ -122,9 +129,9 @@ func getLevelLog(lvlLog config.LVLLog) log.LevelLog {
 	return log.CommonLog
 }
 
-func authMiddleware() gin.HandlerFunc {
+func (server *mdServer) authMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		status, err := tools.CheckCookie(c)
+		status, err := tools.CheckCookie(c, server.mongoSessions)
 		if err != nil {
 			if status == http.StatusUnauthorized {
 				c.HTML(http.StatusUnauthorized, "unauthorized.html", nil)

@@ -6,6 +6,15 @@ document.getElementById("signIn").onclick = function () {
     signInModal.show();
 };
 
+document.getElementById("logOut").onclick = function () {
+    const successCallback = function () {
+        window.location.href = "/";
+        return false;
+    }
+
+    sendRequest("/log_out", {}, successCallback);
+};
+
 document.getElementById("signInBtn").onclick = function () {
     const passwordInput = document.getElementById("password");
     const errorDiv = document.getElementById("errorDiv");

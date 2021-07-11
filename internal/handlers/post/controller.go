@@ -4,6 +4,8 @@ import (
 	"html/template"
 	"path"
 
+	"github.com/VxVxN/mdserver/internal/driver/mongo/sessions"
+
 	"github.com/VxVxN/mdserver/internal/driver/mongo/posts"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -17,8 +19,8 @@ import (
 type Controller struct {
 	e.ErrResponseController
 
-	mongoClient *mongo.Client
-	mongoPosts  *posts.MongoPosts
+	mongoPosts    *posts.MongoPosts
+	mongoSessions *sessions.MongoSessions
 
 	indexTemplate       *template.Template
 	postTemplate        *template.Template
@@ -29,8 +31,8 @@ type Controller struct {
 func NewController(mongoClient *mongo.Client) *Controller {
 	pathToLayout := path.Join(consts.PathToTemplates, "layout.html")
 	ctrl := &Controller{
-		mongoClient:         mongoClient,
 		mongoPosts:          posts.Init(mongoClient),
+		mongoSessions:       sessions.Init(mongoClient),
 		indexTemplate:       template.Must(template.ParseFiles(pathToLayout, path.Join(consts.PathToTemplates, "index.html"))),
 		postTemplate:        template.Must(template.ParseFiles(pathToLayout, path.Join(consts.PathToTemplates, "post.html"))),
 		editingPostTemplate: template.Must(template.ParseFiles(pathToLayout, path.Join(consts.PathToTemplates, "editing_post.html"))),

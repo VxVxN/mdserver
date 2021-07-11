@@ -6,8 +6,6 @@ import (
 	"github.com/VxVxN/log"
 	"github.com/VxVxN/mdserver/pkg/tools"
 
-	"github.com/VxVxN/mdserver/internal/glob"
-
 	"github.com/VxVxN/mdserver/pkg/config"
 
 	e "github.com/VxVxN/mdserver/pkg/error"
@@ -17,13 +15,13 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-type Credentials struct {
+type RequestSignIn struct {
 	//Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
 func (ctrl *Controller) SignIn(c *gin.Context) {
-	var req Credentials
+	var req RequestSignIn
 
 	errObj := tools.UnmarshalRequest(c, &req)
 	if errObj != nil {
@@ -39,7 +37,12 @@ func (ctrl *Controller) SignIn(c *gin.Context) {
 
 	sessionToken := uuid.NewV4().String()
 
+	if errObj = ctrl.mongoSessions.Create(sessionToken); errObj != nil {
+		log.Error.Printf("Failed to add session token to mongo: %v", errObj.Error)
+		errObj.JsonResponse(c)
+		return
+	}
+
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("session_token", sessionToken, 120, "", "", true, false)
-	glob.SessionToken = sessionToken
 }

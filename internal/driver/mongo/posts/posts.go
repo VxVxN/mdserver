@@ -33,23 +33,6 @@ func (mgPost *MongoPosts) getCollection() *mongo.Collection {
 	return mgPost.mongoClient.Database("mdServer").Collection("posts")
 }
 
-//func (mgPost *MongoPosts) Get(dirName, fileName string) (*Post, *e.ErrObject) {
-//	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
-//	defer cancel()
-//
-//	var post Post
-//
-//	query := bson.D{{"dirname", dirName}, {"filename", fileName}}
-//	err := mgPost.getCollection().FindOne(ctx, query).Decode(&post)
-//	if err == mongo.ErrNoDocuments {
-//		return nil, e.NewError("Post not found", http.StatusNotFound, err)
-//	} else if err != nil {
-//		return nil, e.NewError("Can't get post", http.StatusInternalServerError, err)
-//	}
-//
-//	return &post, nil
-//}
-
 func (mgPost *MongoPosts) GetList() ([]*Directory, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
 	defer cancel()
@@ -128,7 +111,7 @@ func (mgPost *MongoPosts) DeletePost(dirName, fileName string) *e.ErrObject {
 	if err == mongo.ErrNoDocuments {
 		return e.NewError("Post not found", http.StatusNotFound, err)
 	} else if err != nil {
-		return e.NewError("Can't delete post to mongo", http.StatusInternalServerError, err)
+		return e.NewError("Can't delete post from mongo", http.StatusInternalServerError, err)
 	}
 
 	return nil

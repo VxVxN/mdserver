@@ -1,10 +1,9 @@
 package tools
 
 import (
-	"errors"
 	"net/http"
 
-	"github.com/VxVxN/mdserver/internal/glob"
+	"github.com/VxVxN/mdserver/internal/driver/mongo/sessions"
 
 	"github.com/gin-gonic/gin"
 
@@ -19,8 +18,8 @@ func UnmarshalRequest(c *gin.Context, reqStruct interface{}) *e.ErrObject {
 	return nil
 }
 
-func CheckCookie(c *gin.Context) (int, error) {
-	cookie, err := c.Cookie("session_token")
+func CheckCookie(c *gin.Context, mongoSessions *sessions.MongoSessions) (int, error) {
+	token, err := c.Cookie("session_token")
 	if err != nil {
 		if err == http.ErrNoCookie {
 			return http.StatusUnauthorized, err
@@ -28,8 +27,10 @@ func CheckCookie(c *gin.Context) (int, error) {
 		return http.StatusBadRequest, err
 	}
 
-	if cookie != glob.SessionToken {
-		return http.StatusUnauthorized, errors.New("unauthorized")
+	_, err = mongoSessions.Get(token)
+	if err != nil {
+		return http.StatusUnauthorized, err
 	}
+
 	return 0, nil
 }

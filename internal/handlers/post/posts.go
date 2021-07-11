@@ -32,7 +32,7 @@ func (ctrl *Controller) getPosts(c *gin.Context) *e.ErrObject {
 		return e.NewError("Failed to get posts", http.StatusInternalServerError, err)
 	}
 
-	body := prepareHTML(c, dirs)
+	body := ctrl.prepareHTML(c, dirs)
 
 	if err = ctrl.indexTemplate.ExecuteTemplate(c.Writer, "layout", post.TemplatePost{
 		Title: "Notes",
@@ -45,9 +45,9 @@ func (ctrl *Controller) getPosts(c *gin.Context) *e.ErrObject {
 }
 
 // TODO: transfer this to front
-func prepareHTML(c *gin.Context, dirs []*posts.Directory) string {
+func (ctrl *Controller) prepareHTML(c *gin.Context, dirs []*posts.Directory) string {
 	var body string
-	_, err := tools.CheckCookie(c)
+	_, err := tools.CheckCookie(c, ctrl.mongoSessions)
 	if err == nil {
 		body = "[<a href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#createDirectoryModal\">Create directory</a>]"
 		for _, dir := range dirs {
