@@ -44,5 +44,5 @@ func (ctrl *Controller) SignIn(c *gin.Context) {
 	}
 
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("session_token", sessionToken, 120, "", "", true, false)
+	c.SetCookie("session_token", sessionToken, config.Cfg.SessionAge, "", "", true, false)
 }

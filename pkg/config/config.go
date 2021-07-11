@@ -10,9 +10,10 @@ var Cfg *config
 
 // config - structure for reading the configuration file.
 type config struct {
-	Listen   string `yaml:"listen"`
-	LevelLog LVLLog `yaml:"level_log"`
-	Password string `yaml:"password"`
+	Listen     string `yaml:"listen"`
+	LevelLog   LVLLog `yaml:"level_log"`
+	Password   string `yaml:"password"`
+	SessionAge int    `yaml:"session_age"`
 }
 
 type LVLLog string
