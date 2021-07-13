@@ -26,6 +26,5 @@ func NewController(mongoClient *mongo.Client) *Controller {
 		mongoSessions: sessions.Init(mongoClient),
 		posts:         post.NewPostArray(),
 	}
-	ctrl.InitErrResponseController()
 	return ctrl
 }

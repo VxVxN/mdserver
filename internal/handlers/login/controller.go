@@ -16,6 +16,5 @@ func NewController(mongoClient *mongo.Client) *Controller {
 	ctrl := &Controller{
 		mongoSessions: sessions.Init(mongoClient),
 	}
-	ctrl.InitErrResponseController()
 	return ctrl
 }

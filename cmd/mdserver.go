@@ -134,7 +134,11 @@ func (server *mdServer) authMiddleware() gin.HandlerFunc {
 		status, err := tools.CheckCookie(c, server.mongoSessions)
 		if err != nil {
 			if status == http.StatusUnauthorized {
-				c.HTML(http.StatusUnauthorized, "unauthorized.html", nil)
+				c.HTML(http.StatusUnauthorized, "error.tmpl", map[string]interface{}{
+					"Status": http.StatusUnauthorized,
+					"Error":  "Unauthorized",
+				})
+
 			} else {
 				e.NewError("Bad Request", http.StatusBadRequest, err).JsonResponse(c)
 			}
