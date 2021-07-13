@@ -2,7 +2,6 @@ package post
 
 import (
 	"fmt"
-	"net/http"
 	"path"
 	"strings"
 
@@ -30,10 +29,8 @@ func (ctrl *Controller) getPost(c *gin.Context) *e.ErrObject {
 		err = fmt.Errorf("can't get post: %v, post: %s", err, postMD)
 		return e.NewError("Failed to get post", status, err)
 	}
-	if err = ctrl.postTemplate.ExecuteTemplate(c.Writer, "layout", templatePost); err != nil {
-		err = fmt.Errorf("can't execute template: %v, post: %s", err, templatePost.Title)
-		return e.NewError("Failed to get post", http.StatusInternalServerError, err)
-	}
+	c.HTML(200, "post.tmpl", templatePost)
+
 	return nil
 }
 

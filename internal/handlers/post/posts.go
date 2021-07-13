@@ -34,13 +34,11 @@ func (ctrl *Controller) getPosts(c *gin.Context) *e.ErrObject {
 
 	body := ctrl.prepareHTML(c, dirs)
 
-	if err = ctrl.indexTemplate.ExecuteTemplate(c.Writer, "layout", post.TemplatePost{
+	c.HTML(200, "index.tmpl", post.TemplatePost{
 		Title: "Notes",
 		Body:  template.HTML(body),
-	}); err != nil {
-		err = fmt.Errorf("can't execute template: %v", err)
-		return e.NewError("Failed to execute template", http.StatusInternalServerError, err)
-	}
+	})
+
 	return nil
 }
 
