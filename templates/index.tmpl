@@ -9,9 +9,9 @@
       <script src="/static/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
       <div class="d-flex flex-column" style="height: 100vh">
           {{ template "navbar.tmpl" .}}
-          <div class="container" id="container">
+          <div class="container flex-grow-1" id="container">
             <div class="row" style="text-align:left;">
-                <div class="col-md-8 col-md-offset-2">
+                <div class="col-md-8 col-md-offset-2 d-flex flex-column w-100">
                     <h1>{{.Title}}</h1>
                     {{.Body}}
                     <!-- sign in modal -->
