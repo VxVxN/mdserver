@@ -64,7 +64,7 @@
                 </div>
                 <!-- end create directory modal -->
                 <!-- delete modal -->
-                <div class="modal fade" id="deleteDirectoryModal" tabindex="-1" aria-labelledby="deleteDirectoryModal" aria-hidden="true">
+                <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModal" aria-hidden="true">
                    <div class="modal-dialog">
                       <div class="modal-content">
                          <div class="modal-header">
@@ -110,6 +110,30 @@
                    </div>
                 </div>
                 <!-- end create post modal -->
+                <!-- rename modal -->
+                <div class="modal fade" id="renameModal" tabindex="-1" aria-labelledby="renameModal" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="renameModalTitle"></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form>
+                                    <div class="mb-3">
+                                        <label for="renameModalName" class="col-form-label" id="renameModalLabel"></label>
+                                        <input type="text" class="form-control" id="renameModalName">
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancelRenameModalBtn">Cancel</button>
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="renameModalBtn">Rename</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end rename modal -->
              </div>
           </div>
        </div>

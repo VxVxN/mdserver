@@ -85,12 +85,44 @@ func (mgPost *MongoPosts) DeleteDirectory(dirName string) *e.ErrObject {
 	return nil
 }
 
+func (mgPost *MongoPosts) RenameDirectory(oldDirName, newDirName string) *e.ErrObject {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
+	defer cancel()
+	filter := bson.D{{"dir", oldDirName}}
+	update := bson.D{{"$set", bson.D{{"dir", newDirName}}}}
+	_, err := mgPost.getCollection().UpdateOne(ctx, filter, update)
+	if err == mongo.ErrNoDocuments {
+		return e.NewError("Directory not found", http.StatusNotFound, err)
+	} else if err != nil {
+		return e.NewError("Can't rename directory to mongo", http.StatusInternalServerError, err)
+	}
+
+	return nil
+}
+
 func (mgPost *MongoPosts) CreatePost(dirName, fileName string) *e.ErrObject {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
 	defer cancel()
 
 	filter := bson.D{{"dir", dirName}}
 	update := bson.D{{"$push", bson.D{{"files", fileName}}}}
+
+	_, err := mgPost.getCollection().UpdateOne(ctx, filter, update)
+	if err == mongo.ErrNoDocuments {
+		return e.NewError("Directory not found", http.StatusNotFound, err)
+	} else if err != nil {
+		return e.NewError("Can't create post to mongo", http.StatusInternalServerError, err)
+	}
+
+	return nil
+}
+
+func (mgPost *MongoPosts) RenamePost(dirName, oldFileName, newFileName string) *e.ErrObject {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
+	defer cancel()
+
+	filter := bson.D{{"dir", dirName}, {"files", oldFileName}}
+	update := bson.D{{"$set", bson.D{{"files.$", newFileName}}}}
 
 	_, err := mgPost.getCollection().UpdateOne(ctx, filter, update)
 	if err == mongo.ErrNoDocuments {

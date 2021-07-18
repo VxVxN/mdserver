@@ -68,19 +68,23 @@ document.getElementById("cancelPostModalBtn").onclick = function () {
     document.getElementById("createPostName").value = "";
 };
 
+document.getElementById("cancelRenameModalBtn").onclick = function () {
+    document.getElementById("renameModalName").value = "";
+};
+
 document.addEventListener('click',function(e){
     if (e.target.classList.contains('deleteModal')) {
         if (e.target.dataset.type === 'directory') {
             document.getElementById("deleteModalLabel").innerText = 'Are you sure you want to delete the directory ' + e.target.dataset.name + '?';
-            document.getElementById("deleteModalTitle").innerText = "Delete the directory";
+            document.getElementById("deleteModalTitle").innerText = "Delete the directory:" +  e.target.dataset.name;
         } else {
             document.getElementById("deleteModalLabel").innerText = 'Are you sure you want to delete the file ' + e.target.dataset.name + '?';
-            document.getElementById("deleteModalTitle").innerText = "Delete the file";
+            document.getElementById("deleteModalTitle").innerText = "Delete the file: " +  e.target.dataset.name;
 
             document.getElementById("deleteModalBtn").dataset.dirname = e.target.dataset.dirname;
         }
 
-        const container = document.getElementById('deleteDirectoryModal');
+        const container = document.getElementById('deleteModal');
         const modal = new bootstrap.Modal(container);
         modal.show();
 
@@ -89,6 +93,24 @@ document.addEventListener('click',function(e){
     }
     if (e.target.classList.contains('createPost')) {
         document.getElementById("createPostModalBtn").dataset.dirname = e.target.dataset.dirname;
+    }
+    if (e.target.classList.contains('renameModal')) {
+        if (e.target.dataset.type === 'directory') {
+            document.getElementById("renameModalLabel").innerText = 'Are you sure you want to rename the directory ' + e.target.dataset.name + '?';
+            document.getElementById("renameModalTitle").innerText = "Rename the directory: " +  e.target.dataset.name;
+        } else {
+            document.getElementById("renameModalLabel").innerText = 'Are you sure you want to rename the file ' + e.target.dataset.name + '?';
+            document.getElementById("renameModalTitle").innerText = "Rename the file: " +  e.target.dataset.name;
+
+            document.getElementById("renameModalBtn").dataset.dirname = e.target.dataset.dirname;
+        }
+
+        const container = document.getElementById('renameModal');
+        const modal = new bootstrap.Modal(container);
+        modal.show();
+
+        document.getElementById("renameModalBtn").dataset.name = e.target.dataset.name;
+        document.getElementById("renameModalBtn").dataset.type = e.target.dataset.type;
     }
 })
 
@@ -104,6 +126,24 @@ document.getElementById("deleteModalBtn").onclick = function () {
     } else {
         const data = {dir_name: this.dataset.dirname, file_name: this.dataset.name};
         sendRequest("/delete_post", data, successCallback.bind(this, window));
+    }
+}
+
+document.getElementById("renameModalBtn").onclick = function () {
+    const newName = document.getElementById("renameModalName").value;
+
+    const successCallback = function () {
+        document.getElementById("renameModalName").value = "";
+        window.location.reload();
+        return false;
+    }
+
+    if (this.dataset.type === 'directory') {
+        const data = {old_name:this.dataset.name, new_name:newName};
+        sendRequest("/rename_directory", data, successCallback.bind(this, window));
+    } else {
+        const data = {dir_name: this.dataset.dirname, old_file_name: this.dataset.name, new_file_name: newName};
+        sendRequest("/rename_post", data, successCallback.bind(this, window));
     }
 }
 

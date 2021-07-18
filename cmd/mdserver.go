@@ -56,12 +56,14 @@ func main() {
 	authRouter := server.router.Group("")
 	authRouter.Use(server.authMiddleware())
 	{
-		authRouter.POST("/delete_post", server.postCtrl.DeletePostHandler)
 		authRouter.POST("/create_post", server.postCtrl.CreatePostHandler)
 		authRouter.POST("/save_post", server.postCtrl.SavePostHandler)
+		authRouter.POST("/rename_post", server.postCtrl.RenamePostHandler)
+		authRouter.POST("/delete_post", server.postCtrl.DeletePostHandler)
 		authRouter.POST("/preview", server.postCtrl.PreviewPostHandler)
 
 		authRouter.POST("/create_directory", server.postCtrl.CreateDirectoryHandler)
+		authRouter.POST("/rename_directory", server.postCtrl.RenameDirectoryHandler)
 		authRouter.POST("/delete_directory", server.postCtrl.DeleteDirectoryHandler)
 
 		authRouter.GET("/edit/:dir/:file", server.postCtrl.EditPostHandler)
