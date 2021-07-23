@@ -72,6 +72,8 @@ func main() {
 
 	server.router.GET("/", server.postCtrl.PostsHandler)
 
+	server.router.NoRoute(noRouteHandler)
+
 	listen := config.Cfg.Listen
 	log.Info.Printf("Listening %s", listen)
 	if err = server.router.RunTLS(listen, "https-server.crt", "https-server.key"); err != nil {
@@ -140,11 +142,17 @@ func (server *mdServer) authMiddleware() gin.HandlerFunc {
 					"Status": http.StatusUnauthorized,
 					"Error":  "Unauthorized",
 				})
-
 			} else {
 				e.NewError("Bad Request", http.StatusBadRequest, err).JsonResponse(c)
 			}
 			c.Abort()
 		}
 	}
+}
+
+func noRouteHandler(c *gin.Context) {
+	c.HTML(http.StatusNotFound, "error.tmpl", map[string]interface{}{
+		"Status": http.StatusNotFound,
+		"Error":  "Page not found",
+	})
 }

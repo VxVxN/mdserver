@@ -2,6 +2,7 @@ package post
 
 import (
 	"fmt"
+	"net/http"
 	"path"
 	"strings"
 
@@ -16,6 +17,12 @@ import (
 func (ctrl *Controller) PostHandler(c *gin.Context) {
 	if errObj := ctrl.getPost(c); errObj != nil {
 		log.Error.Printf("Failed to edit post: %v", errObj.Error)
+		if errObj.Status == http.StatusNotFound {
+			c.HTML(http.StatusNotFound, "error.tmpl", map[string]interface{}{
+				"Status": http.StatusNotFound,
+				"Error":  "Page not found",
+			})
+		}
 		errObj.JsonResponse(c)
 		return
 	}
