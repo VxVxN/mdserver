@@ -1,3 +1,5 @@
+let cursorLocation;
+
 document.getElementById("savePost").onclick = function () {
     const currentPageUrl = decodeURI(window.location.href);
     const splitUrl = currentPageUrl.split('/');
@@ -34,3 +36,26 @@ document.getElementById("previewTab").onclick = function () {
 document.getElementById("editingTab").onclick = function () {
     document.getElementById("editing").classList.remove('d-none');
 }
+
+document.getElementById("fileUploadBtn").onclick = function () {
+    const textarea = document.getElementById('postText');
+    cursorLocation = textarea.selectionStart;
+    document.getElementById('fileUpload').click();
+}
+
+document.getElementById('fileUpload').addEventListener('change', function () {
+    const textarea = document.getElementById('postText');
+
+    const image = this.files[0];
+    const successCallback = function () {
+        const imagePath = `![](/static/images/${image.name})`;
+
+        const text = textarea.value.substring(0, cursorLocation) + imagePath + textarea.value.substring(cursorLocation);
+
+        textarea.value = text;
+        textarea.focus();
+        return false;
+    };
+
+    sendRequestWithFile(window.location.href+'/image_upload', image, successCallback);
+});

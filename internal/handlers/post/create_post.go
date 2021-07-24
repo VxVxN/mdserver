@@ -45,7 +45,10 @@ func (ctrl *Controller) createPost(req RequestCreatePost) *e.ErrObject {
 		err = fmt.Errorf("can't create post: %v", err)
 		return e.NewError("Failed to create post", http.StatusInternalServerError, err)
 	}
-	tools.CloseFile(file)
+	if err = file.Close(); err != nil {
+		err = fmt.Errorf("can't close file: %v", err)
+		return e.NewError("Failed to close file", http.StatusInternalServerError, err)
+	}
 
 	if errObj := ctrl.mongoPosts.CreatePost(req.DirName, req.FileName); errObj != nil {
 		return errObj

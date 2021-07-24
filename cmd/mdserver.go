@@ -45,8 +45,8 @@ func main() {
 	}
 	defer server.Stop()
 
-	server.router.Static("/static/", glob.WorkDir+"/public/static")
-	server.router.StaticFile("/favicon.ico", glob.WorkDir+"/public/static/images/favicon.ico")
+	server.router.Static("/static/", consts.PathToStatic)
+	server.router.StaticFile("/favicon.ico", consts.PathToStaticImages+"/favicon.ico")
 
 	server.router.LoadHTMLGlob(consts.PathToTemplates + "/*")
 
@@ -66,6 +66,7 @@ func main() {
 		authRouter.POST("/rename_directory", server.postCtrl.RenameDirectoryHandler)
 		authRouter.POST("/delete_directory", server.postCtrl.DeleteDirectoryHandler)
 
+		authRouter.POST("/edit/:dir/:file/image_upload", server.postCtrl.ImageUploadHandler)
 		authRouter.GET("/edit/:dir/:file", server.postCtrl.EditPostHandler)
 		authRouter.GET("/:dir/:file", server.postCtrl.PostHandler)
 	}
@@ -106,7 +107,12 @@ func InitServer() (*mdServer, error) {
 
 	server.MongoClient = client
 
-	server.postCtrl = post.NewController(server.MongoClient)
+	server.postCtrl, err = post.NewController(server.MongoClient)
+	if err != nil {
+		log.Fatal.Printf("Failed init post controller : %v", err)
+		return nil, fmt.Errorf("error on init post controller: %v", err)
+	}
+
 	server.loginCtrl = login.NewController(server.MongoClient)
 
 	server.mongoSessions = sessions.Init(server.MongoClient)
