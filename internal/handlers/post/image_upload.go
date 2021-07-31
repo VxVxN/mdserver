@@ -26,7 +26,7 @@ func (ctrl *Controller) ImageUploadHandler(c *gin.Context) {
 		return
 	}
 	if errObj := ctrl.copyRequestFileToTmpFile(form); errObj != nil {
-		log.Error.Printf("Failed to add tmp image: %v", err)
+		log.Error.Printf("Failed to add tmp image: %v", errObj.Error)
 		errObj.JsonResponse(c)
 		return
 	}

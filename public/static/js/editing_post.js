@@ -28,6 +28,8 @@ document.getElementById("previewTab").onclick = function () {
     const data = {text:previewText};
     const successCallback = function (response) {
         document.getElementById("preview").innerHTML = response;
+        hljs.initHighlighting.called = false;
+        hljs.initHighlighting();
         return false;
     }
     sendRequest("/preview", data, successCallback);
@@ -59,3 +61,15 @@ document.getElementById('fileUpload').addEventListener('change', function () {
 
     sendRequestWithFile(window.location.href+'/image_upload', image, successCallback);
 });
+
+document.getElementById('postText').onkeydown = function (event) {
+    if (event.key === 'Tab') {
+        const textarea = document.getElementById('postText');
+        const fourSpace = '    ';
+        const currentCursorPosition = textarea.selectionStart
+        textarea.value = textarea.value.substring(0, currentCursorPosition) + fourSpace + textarea.value.substring(currentCursorPosition);
+        textarea.selectionStart = currentCursorPosition + fourSpace.length;
+        textarea.selectionEnd = currentCursorPosition + fourSpace.length;
+        return false;
+    }
+}

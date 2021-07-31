@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/VxVxN/log"
+
 	"github.com/VxVxN/mdserver/pkg/consts"
 	e "github.com/VxVxN/mdserver/pkg/error"
 	"github.com/VxVxN/mdserver/pkg/tools"
@@ -68,7 +69,7 @@ func (ctrl *Controller) saveImages(text string, fileName string) {
 
 	for _, rawStr := range rawImageLinks {
 		rawStr = strings.TrimSpace(rawStr)
-		rawStr = strings.TrimLeft(rawStr, "![](/static/images/")
+		rawStr = strings.TrimPrefix(rawStr, "![](/static/images/")
 		fileName = rawStr[:len(rawStr)-1]
 
 		pathToSource := path.Join(consts.PathToTmpImages, fileName)

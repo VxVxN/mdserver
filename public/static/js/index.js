@@ -6,6 +6,12 @@ document.getElementById("signIn").onclick = function () {
     signInModal.show();
 };
 
+document.getElementById("password").onkeyup = function (event) {
+    if (event.key === 'Enter') {
+        document.getElementById("signInBtn").click();
+    }
+}
+
 document.getElementById("logOut").onclick = function () {
     const successCallback = function () {
         window.location.href = "/";
