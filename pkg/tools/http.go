@@ -46,3 +46,14 @@ func GetUserNameFromSession(c *gin.Context) (string, error) {
 
 	return username, nil
 }
+
+func IsAuthUser(c *gin.Context) bool {
+	session := sessions.Default(c)
+
+	username := session.Get("username")
+	if username == nil {
+		return false
+	}
+
+	return true
+}

@@ -17,6 +17,7 @@ type TemplatePost struct {
 	Title   string
 	Body    template.HTML
 	ModTime int64
+	IsAuth  bool
 }
 
 type Array struct {
@@ -53,7 +54,7 @@ func (p *Array) Get(md string, isEdit bool) (TemplatePost, int, error) {
 		lines := strings.Split(string(fileText), "\n")
 		body := getBody(lines, isEdit)
 
-		p.Items[md] = TemplatePost{"", template.HTML(body), info.ModTime().UnixNano()}
+		p.Items[md] = TemplatePost{"", template.HTML(body), info.ModTime().UnixNano(), false}
 	}
 	mdPost := p.Items[md]
 	return mdPost, http.StatusOK, nil

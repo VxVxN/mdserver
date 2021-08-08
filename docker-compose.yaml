@@ -13,6 +13,8 @@ services:
   mongodb:
     image: andresvidal/rpi3-mongodb3
     restart: always
+    ports:
+      - "27017:27017"
     container_name: 'mongo'
     volumes:
     - /data/db:/data/db

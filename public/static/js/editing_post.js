@@ -54,6 +54,8 @@ document.getElementById('fileUpload').addEventListener('change', function () {
         const text = textarea.value.substring(0, cursorLocation) + imagePath + textarea.value.substring(cursorLocation);
 
         textarea.value = text;
+        textarea.selectionStart = cursorLocation+imagePath.length;
+        textarea.selectionEnd = cursorLocation+imagePath.length;
         textarea.focus();
         return false;
     };

@@ -32,8 +32,9 @@ func (ctrl *Controller) getPosts(c *gin.Context) *e.ErrObject {
 	}
 
 	c.HTML(200, "index.tmpl", post.TemplatePost{
-		Title: "Notes",
-		Body:  template.HTML(body),
+		Title:  "Notes",
+		Body:   template.HTML(body),
+		IsAuth: tools.IsAuthUser(c),
 	})
 
 	return nil

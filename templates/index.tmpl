@@ -8,7 +8,11 @@
    <body class="vh-100">
       <script src="/static/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
       <div class="d-flex flex-column" style="height: 100vh">
-          {{ template "navbar.tmpl" .}}
+          {{if .IsAuth}}
+            {{ template "auth_navbar.tmpl" .}}
+          {{else}}
+            {{ template "navbar.tmpl" .}}
+          {{end}}
           <div class="container flex-grow-1" id="container">
             <div class="row" style="text-align:left;">
                 <div class="col-md-8 col-md-offset-2 d-flex flex-column w-100">

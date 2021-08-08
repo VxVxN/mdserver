@@ -1,11 +1,13 @@
 const container = document.getElementById('signInModal');
 const signInModal = new bootstrap.Modal(container);
 
-document.getElementById("signIn").onclick = function () {
-    document.getElementById("password").classList.remove("is-invalid");
-    document.getElementById("username").classList.remove("is-invalid");
-    signInModal.show();
-};
+if (document.getElementById("signIn") !== null) {
+    document.getElementById("signIn").onclick = function () {
+        document.getElementById("password").classList.remove("is-invalid");
+        document.getElementById("username").classList.remove("is-invalid");
+        signInModal.show();
+    };
+}
 
 document.getElementById("username").onkeyup = function (event) {
     if (event.key === 'Enter') {
@@ -19,14 +21,16 @@ document.getElementById("password").onkeyup = function (event) {
     }
 };
 
-document.getElementById("logOut").onclick = function () {
-    const successCallback = function () {
-        window.location.href = "/";
-        return false;
-    }
+if (document.getElementById("logOut") !== null) {
+    document.getElementById("logOut").onclick = function () {
+        const successCallback = function () {
+            window.location.href = "/";
+            return false;
+        }
 
-    sendRequest("/log_out", {}, successCallback);
-};
+        sendRequest("/log_out", {}, successCallback);
+    };
+}
 
 document.getElementById("signInBtn").onclick = function () {
     const usernameInput = document.getElementById("username");
