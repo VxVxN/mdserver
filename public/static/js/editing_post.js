@@ -1,10 +1,8 @@
 let cursorLocation;
 
 document.getElementById("savePost").onclick = function () {
-    const currentPageUrl = decodeURI(window.location.href);
-    const splitUrl = currentPageUrl.split('/');
-    const fileName = splitUrl[splitUrl.length-1];
-    const dirName = splitUrl[splitUrl.length-2];
+    const fileName = getFileName();
+    const dirName = getDirName();
 
     const successCallback = function () {
         window.location.href = "/";
@@ -49,8 +47,9 @@ document.getElementById('fileUpload').addEventListener('change', function () {
     const textarea = document.getElementById('postText');
 
     const image = this.files[0];
-    const successCallback = function () {
-        const imagePath = `![](/static/images/${image.name})`;
+    const successCallback = function (resp) {
+        const response = JSON.parse(resp);
+        const imagePath = `![](/images/${response.image})`;
 
         const text = textarea.value.substring(0, cursorLocation) + imagePath + textarea.value.substring(cursorLocation);
 
@@ -72,4 +71,18 @@ document.getElementById('postText').onkeydown = function (event) {
         textarea.selectionEnd = currentCursorPosition + fourSpace.length;
         return false;
     }
+}
+
+function getDirName() {
+    const currentPageUrl = decodeURI(window.location.href);
+    const splitUrl = currentPageUrl.split('/');
+    const dirName = splitUrl[splitUrl.length-2];
+    return dirName
+}
+
+function getFileName() {
+    const currentPageUrl = decodeURI(window.location.href);
+    const splitUrl = currentPageUrl.split('/');
+    const fileName = splitUrl[splitUrl.length-1];
+    return fileName
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/VxVxN/log"
+
 	"github.com/VxVxN/mdserver/pkg/consts"
 	e "github.com/VxVxN/mdserver/pkg/error"
 	"github.com/VxVxN/mdserver/pkg/tools"
@@ -29,15 +30,21 @@ func (ctrl *Controller) CreatePostHandler(c *gin.Context) {
 		return
 	}
 
-	if errObj = ctrl.createPost(req); errObj != nil {
+	if errObj = ctrl.createPost(c, req); errObj != nil {
 		log.Error.Printf("Failed to create post: %v", errObj.Error)
 		errObj.JsonResponse(c)
 		return
 	}
 }
 
-func (ctrl *Controller) createPost(req RequestCreatePost) *e.ErrObject {
-	pathToDir := path.Join(consts.PathToPosts, req.DirName, req.FileName)
+func (ctrl *Controller) createPost(c *gin.Context, req RequestCreatePost) *e.ErrObject {
+	username, err := tools.GetUserNameFromSession(c)
+	if err != nil {
+		err = fmt.Errorf("cannot get username from session: %v", err)
+		return e.NewError("Failed to get username from session", http.StatusBadRequest, err)
+	}
+
+	pathToDir := path.Join(consts.PathToPosts, username, req.DirName, req.FileName)
 	pathToDir += consts.ExtMd
 
 	file, err := os.Create(pathToDir)
@@ -50,7 +57,7 @@ func (ctrl *Controller) createPost(req RequestCreatePost) *e.ErrObject {
 		return e.NewError("Failed to close file", http.StatusInternalServerError, err)
 	}
 
-	if errObj := ctrl.mongoPosts.CreatePost(req.DirName, req.FileName); errObj != nil {
+	if errObj := ctrl.mongoPosts.CreatePost(username, req.DirName, req.FileName); errObj != nil {
 		return errObj
 	}
 	return nil

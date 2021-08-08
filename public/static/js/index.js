@@ -3,14 +3,21 @@ const signInModal = new bootstrap.Modal(container);
 
 document.getElementById("signIn").onclick = function () {
     document.getElementById("password").classList.remove("is-invalid");
+    document.getElementById("username").classList.remove("is-invalid");
     signInModal.show();
+};
+
+document.getElementById("username").onkeyup = function (event) {
+    if (event.key === 'Enter') {
+        document.getElementById("signInBtn").click();
+    }
 };
 
 document.getElementById("password").onkeyup = function (event) {
     if (event.key === 'Enter') {
         document.getElementById("signInBtn").click();
     }
-}
+};
 
 document.getElementById("logOut").onclick = function () {
     const successCallback = function () {
@@ -22,11 +29,21 @@ document.getElementById("logOut").onclick = function () {
 };
 
 document.getElementById("signInBtn").onclick = function () {
+    const usernameInput = document.getElementById("username");
     const passwordInput = document.getElementById("password");
+
     const errorDiv = document.getElementById("errorDiv");
 
+    const username = usernameInput.value;
     const password = passwordInput.value;
+
     document.getElementById("createPostName").value = '';
+
+    if (username === "") {
+        errorDiv.innerText = "The username cannot be empty";
+        usernameInput.classList.add("is-invalid");
+        return;
+    }
 
     if (password === "") {
         errorDiv.innerText = "The password cannot be empty";
@@ -41,12 +58,11 @@ document.getElementById("signInBtn").onclick = function () {
     }
 
     const errorCallback = function () {
-        errorDiv.innerText = "Incorrect password";
-        passwordInput.classList.add("is-invalid");
+        errorDiv.innerText = "Incorrect username or password";
         return false;
     }
 
-    const data = {password:password};
+    const data = {username: username, password: password};
     sendRequest("/sign_in", data, successCallback.bind(this, window), errorCallback);
 };
 

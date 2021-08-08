@@ -1,9 +1,11 @@
 package tools
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 
-	"github.com/VxVxN/mdserver/internal/driver/mongo/sessions"
+	"github.com/gin-contrib/sessions"
 
 	"github.com/gin-gonic/gin"
 
@@ -18,19 +20,29 @@ func UnmarshalRequest(c *gin.Context, reqStruct interface{}) *e.ErrObject {
 	return nil
 }
 
-func CheckCookie(c *gin.Context, mongoSessions *sessions.MongoSessions) (int, error) {
-	token, err := c.Cookie("session_token")
-	if err != nil {
-		if err == http.ErrNoCookie {
-			return http.StatusUnauthorized, err
-		}
-		return http.StatusBadRequest, err
-	}
+func CheckSession(c *gin.Context) (int, error) {
+	session := sessions.Default(c)
 
-	_, err = mongoSessions.Get(token)
-	if err != nil {
-		return http.StatusUnauthorized, err
+	token := session.Get("token")
+	if token == nil {
+		return http.StatusUnauthorized, errors.New("token not found")
 	}
 
 	return 0, nil
+}
+
+func GetUserNameFromSession(c *gin.Context) (string, error) {
+	session := sessions.Default(c)
+
+	usernameI := session.Get("username")
+	if usernameI == nil {
+		return "", errors.New("username not found in session")
+	}
+
+	username, ok := usernameI.(string)
+	if !ok {
+		return "", fmt.Errorf("incorrect username in session, expected string, actual: %T", usernameI)
+	}
+
+	return username, nil
 }

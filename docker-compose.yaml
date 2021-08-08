@@ -9,6 +9,7 @@ services:
       - mongodb
     volumes:
       - ./posts:/app/posts
+      - ./public/static/images:/app/public/static/images
   mongodb:
     image: andresvidal/rpi3-mongodb3
     restart: always

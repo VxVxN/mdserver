@@ -1,6 +1,7 @@
 package post
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"path"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/VxVxN/log"
 
+	"github.com/VxVxN/mdserver/internal/driver/mongo/posts"
 	"github.com/VxVxN/mdserver/pkg/consts"
 	e "github.com/VxVxN/mdserver/pkg/error"
 	"github.com/VxVxN/mdserver/pkg/tools"
@@ -31,25 +33,38 @@ func (ctrl *Controller) SavePostHandler(c *gin.Context) {
 		return
 	}
 
-	if errObj = ctrl.SavePost(req.DirName, req.FileName, req.Text, false); errObj != nil {
+	if errObj = ctrl.SavePost(c, req.DirName, req.FileName, req.Text, false); errObj != nil {
 		log.Error.Printf("Failed to save post: %v", errObj.Error)
 		errObj.JsonResponse(c)
 		return
 	}
 }
 
-func (ctrl *Controller) SavePost(dirName, fileName, text string, isCreateFile bool) *e.ErrObject {
+func (ctrl *Controller) SavePost(c *gin.Context, dirName, fileName, text string, isCreateFile bool) *e.ErrObject {
 	dirName = strings.Replace(dirName, "+", " ", -1)
 	fileName = strings.Replace(fileName, "+", " ", -1)
 
-	pathToFile := path.Join(consts.PathToPosts, dirName, fileName) + consts.ExtMd
+	username, err := tools.GetUserNameFromSession(c)
+	if err != nil {
+		err = fmt.Errorf("cannot get username from session: %v", err)
+		return e.NewError("Failed to get username from session", http.StatusBadRequest, err)
+	}
+
+	pathToFile := path.Join(consts.PathToPosts, username, dirName, fileName) + consts.ExtMd
 
 	flags := os.O_TRUNC | os.O_WRONLY
 	if isCreateFile {
 		flags |= os.O_CREATE
 	}
 
-	ctrl.saveImages(text, fileName)
+	images, err := ctrl.saveImages(c, text)
+	if err != nil {
+		return e.NewError("Error save image", http.StatusInternalServerError, err)
+	}
+
+	if errObj := ctrl.mongoPosts.AddImagesToPost(username, dirName, fileName, images); errObj != nil {
+		return errObj
+	}
 
 	file, err := os.OpenFile(pathToFile, flags, 0644)
 	if err != nil {
@@ -64,22 +79,61 @@ func (ctrl *Controller) SavePost(dirName, fileName, text string, isCreateFile bo
 	return nil
 }
 
-func (ctrl *Controller) saveImages(text string, fileName string) {
-	rawImageLinks := ctrl.imageLinkRegexp.FindAllString(text, -1)
+func (ctrl *Controller) saveImages(c *gin.Context, text string) ([]posts.Image, error) {
+	username, err := tools.GetUserNameFromSession(c)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get username from session: %v", err)
+	}
+	pathToTmpImages := path.Join(consts.PathToPosts, username, "tmp_images")
 
+	tmpImageNames, err := tools.GetFileNamesInDir(pathToTmpImages)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get image names from tmp images: %v", err)
+	}
+
+	rawImageLinks := ctrl.imageLinkRegexp.FindAllString(text, -1)
+	imageNames := make([]posts.Image, 0, len(rawImageLinks))
 	for _, rawStr := range rawImageLinks {
 		rawStr = strings.TrimSpace(rawStr)
-		rawStr = strings.TrimPrefix(rawStr, "![](/static/images/")
-		fileName = rawStr[:len(rawStr)-1]
+		rawSlice := strings.Split(rawStr, "/")
+		if len(rawSlice) != 3 {
+			return nil, fmt.Errorf("invalid path %v", rawStr)
+		}
+		rawStr = rawSlice[2]
+		imageUUID := rawStr[:len(rawStr)-1]
 
-		pathToSource := path.Join(consts.PathToTmpImages, fileName)
-		pathToDestination := path.Join(consts.PathToStaticImages, fileName)
+		imageName, err := getImageName(tmpImageNames, imageUUID)
+		if err != nil {
+			continue // file already exists
+		}
+		imageNames = append(imageNames, posts.Image{
+			UUID: imageUUID,
+			Name: imageName,
+		})
 
-		_ = tools.Copy(pathToSource, pathToDestination)
+		pathToSource := path.Join(pathToTmpImages, imageUUID+"_"+imageName)
+		pathToDestination := path.Join(consts.PathToPosts, username, "images", imageUUID)
+		if err = tools.CopyFile(pathToSource, pathToDestination); err != nil {
+			log.Debug.Printf("Failed to copy file: %v", err)
+		}
 	}
 
-	if err := os.RemoveAll(consts.PathToTmpImages); err != nil {
+	if err = os.RemoveAll(pathToTmpImages); err != nil {
 		log.Warning.Printf("Can't remove tmp images: %v", err)
 	}
-	_ = os.MkdirAll(consts.PathToTmpImages, 0777)
+	_ = os.MkdirAll(pathToTmpImages, 0777)
+	return imageNames, nil
+}
+
+func getImageName(fileNames []string, imageUUID string) (string, error) {
+	for _, name := range fileNames {
+		if strings.HasPrefix(name, imageUUID) {
+			splitName := strings.Split(name, "_")
+			if len(splitName) < 2 {
+				return "", fmt.Errorf("invalid name: %s", name)
+			}
+			return strings.Join(splitName[1:], "_"), nil
+		}
+	}
+	return "", fmt.Errorf("image not found")
 }

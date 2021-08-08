@@ -2,9 +2,11 @@ package post
 
 import (
 	"fmt"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
 
 	e "github.com/VxVxN/mdserver/pkg/error"
-	"github.com/gin-gonic/gin"
 
 	"github.com/VxVxN/log"
 )
@@ -18,7 +20,11 @@ func (ctrl *Controller) EditPostHandler(c *gin.Context) {
 }
 
 func (ctrl *Controller) getEditingPost(c *gin.Context) *e.ErrObject {
-	postMD := ctrl.getPathToPostMD(c)
+	postMD, err := ctrl.getPathToPostMD(c)
+	if err != nil {
+		err = fmt.Errorf("can't get path to post: %v", err)
+		return e.NewError("Failed to get path to post", http.StatusInternalServerError, err)
+	}
 
 	templatePost, status, err := ctrl.posts.Get(postMD, true)
 	if err != nil {

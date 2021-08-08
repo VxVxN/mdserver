@@ -4,24 +4,22 @@ import (
 	"net/http"
 
 	"github.com/VxVxN/log"
-	"github.com/VxVxN/mdserver/pkg/tools"
-
-	"github.com/VxVxN/mdserver/pkg/config"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
 
 	e "github.com/VxVxN/mdserver/pkg/error"
-
-	"github.com/gin-gonic/gin"
-
-	uuid "github.com/satori/go.uuid"
+	"github.com/VxVxN/mdserver/pkg/tools"
 )
 
 type RequestSignIn struct {
-	//Username string `json:"username" binding:"required"`
+	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
 func (ctrl *Controller) SignIn(c *gin.Context) {
 	var req RequestSignIn
+	session := sessions.Default(c)
 
 	errObj := tools.UnmarshalRequest(c, &req)
 	if errObj != nil {
@@ -30,19 +28,17 @@ func (ctrl *Controller) SignIn(c *gin.Context) {
 		return
 	}
 
-	if config.Cfg.Password != req.Password {
-		e.NewError("Incorrect login or password", http.StatusUnauthorized, nil).JsonResponse(c)
+	if _, err := ctrl.mongoUsers.Get(req.Username, req.Password); err != nil {
+		e.NewError("Incorrect login or password", http.StatusBadRequest, nil).JsonResponse(c)
 		return
 	}
-
 	sessionToken := uuid.NewV4().String()
 
-	if errObj = ctrl.mongoSessions.Create(sessionToken); errObj != nil {
-		log.Error.Printf("Failed to add session token to mongo: %v", errObj.Error)
-		errObj.JsonResponse(c)
+	session.Set("token", sessionToken)
+	session.Set("username", req.Username)
+
+	if err := session.Save(); err != nil {
+		e.NewError("Failed to save session", http.StatusInternalServerError, nil).JsonResponse(c)
 		return
 	}
-
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("session_token", sessionToken, config.Cfg.SessionAge, "", "", true, false)
 }

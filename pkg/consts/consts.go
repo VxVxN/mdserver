@@ -13,7 +13,6 @@ const (
 var (
 	PathToTemplates    = path.Join(glob.WorkDir, "templates")
 	PathToPosts        = path.Join(glob.WorkDir, "posts")
-	PathToTmpImages    = path.Join(PathToPosts, "tmp_images")
 	PathToStatic       = path.Join(glob.WorkDir + "/public/static")
 	PathToStaticImages = path.Join(PathToStatic, "images")
 )

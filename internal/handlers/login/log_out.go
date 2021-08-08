@@ -3,23 +3,17 @@ package login
 import (
 	"net/http"
 
-	"github.com/VxVxN/log"
-	e "github.com/VxVxN/mdserver/pkg/error"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+
+	e "github.com/VxVxN/mdserver/pkg/error"
 )
 
 func (ctrl *Controller) LogOut(c *gin.Context) {
-
-	token, err := c.Cookie("session_token")
-	if err != nil {
-		log.Error.Printf("Failed to get cookie: %v", err)
-		e.NewError("session_token not found", http.StatusBadRequest, err)
-		return
-	}
-
-	if errObj := ctrl.mongoSessions.Delete(token); errObj != nil {
-		log.Error.Printf("Failed to delete session from mongo: %v", errObj.Error)
-		errObj.JsonResponse(c)
+	session := sessions.Default(c)
+	session.Clear()
+	if err := session.Save(); err != nil {
+		e.NewError("Failed to logout", http.StatusInternalServerError, err).JsonResponse(c)
 		return
 	}
 }

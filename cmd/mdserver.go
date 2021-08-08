@@ -9,23 +9,21 @@ import (
 	"path"
 	"time"
 
-	"github.com/VxVxN/mdserver/internal/driver/mongo/sessions"
-
-	"github.com/VxVxN/mdserver/pkg/tools"
-
-	e "github.com/VxVxN/mdserver/pkg/error"
-
-	"github.com/VxVxN/mdserver/internal/handlers/login"
-
-	"github.com/VxVxN/mdserver/pkg/consts"
-
 	"github.com/VxVxN/log"
-	"github.com/VxVxN/mdserver/internal/glob"
-	"github.com/VxVxN/mdserver/internal/handlers/post"
-	"github.com/VxVxN/mdserver/pkg/config"
+	ginSessions "github.com/gin-contrib/sessions"
+	sessionMongo "github.com/gin-contrib/sessions/mongo"
 	"github.com/gin-gonic/gin"
+	"github.com/globalsign/mgo"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"github.com/VxVxN/mdserver/internal/glob"
+	"github.com/VxVxN/mdserver/internal/handlers/login"
+	"github.com/VxVxN/mdserver/internal/handlers/post"
+	"github.com/VxVxN/mdserver/pkg/config"
+	"github.com/VxVxN/mdserver/pkg/consts"
+	e "github.com/VxVxN/mdserver/pkg/error"
+	"github.com/VxVxN/mdserver/pkg/tools"
 )
 
 type mdServer struct {
@@ -34,8 +32,6 @@ type mdServer struct {
 
 	postCtrl  *post.Controller
 	loginCtrl *login.Controller
-
-	mongoSessions *sessions.MongoSessions
 }
 
 func main() {
@@ -67,6 +63,7 @@ func main() {
 		authRouter.POST("/delete_directory", server.postCtrl.DeleteDirectoryHandler)
 
 		authRouter.POST("/edit/:dir/:file/image_upload", server.postCtrl.ImageUploadHandler)
+		authRouter.GET("/images/:image", server.postCtrl.GetImageHandler)
 		authRouter.GET("/edit/:dir/:file", server.postCtrl.EditPostHandler)
 		authRouter.GET("/:dir/:file", server.postCtrl.PostHandler)
 	}
@@ -83,11 +80,12 @@ func main() {
 }
 
 func InitServer() (*mdServer, error) {
+	var err error
 	server := mdServer{router: gin.Default()}
 
 	pathConfig := path.Join(glob.WorkDir, "mdserver.yaml")
-	err := config.InitConfig(pathConfig)
-	if err != nil {
+
+	if err = config.InitConfig(pathConfig); err != nil {
 		return nil, fmt.Errorf("can't read config: %v, path: %s", err, pathConfig)
 	}
 
@@ -105,6 +103,16 @@ func InitServer() (*mdServer, error) {
 		return nil, fmt.Errorf("can't connect to mongo db: %v", err)
 	}
 
+	session, err := mgo.Dial("mongodb://mongo:27017")
+	if err != nil {
+		log.Fatal.Printf("Failed to connect to session mongo db: %v", err)
+		return nil, fmt.Errorf("can't connect to session mongo db: %v", err)
+	}
+
+	c := session.DB("mdServer").C("sessions")
+	store := sessionMongo.NewStore(c, config.Cfg.SessionAge*60, true, []byte(config.Cfg.SessionSecret))
+	server.router.Use(ginSessions.Sessions("mdSession", store))
+
 	server.MongoClient = client
 
 	server.postCtrl, err = post.NewController(server.MongoClient)
@@ -114,8 +122,6 @@ func InitServer() (*mdServer, error) {
 	}
 
 	server.loginCtrl = login.NewController(server.MongoClient)
-
-	server.mongoSessions = sessions.Init(server.MongoClient)
 
 	return &server, nil
 }
@@ -141,7 +147,7 @@ func getLevelLog(lvlLog config.LVLLog) log.LevelLog {
 
 func (server *mdServer) authMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		status, err := tools.CheckCookie(c, server.mongoSessions)
+		status, err := tools.CheckSession(c)
 		if err != nil {
 			if status == http.StatusUnauthorized {
 				c.HTML(http.StatusUnauthorized, "error.tmpl", map[string]interface{}{

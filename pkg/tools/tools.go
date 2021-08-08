@@ -2,9 +2,6 @@ package tools
 
 import (
 	"context"
-	"fmt"
-	"io"
-	"os"
 
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -27,27 +24,11 @@ func CloseMongoCursor(cur *mongo.Cursor, ctx context.Context) {
 	}
 }
 
-func Copy(src, dst string) error {
-	sourceFileStat, err := os.Stat(src)
-	if err != nil {
-		return err
+func ContainString(slice []string, elem string) bool {
+	for _, elemSlice := range slice {
+		if elemSlice == elem {
+			return true
+		}
 	}
-
-	if !sourceFileStat.Mode().IsRegular() {
-		return fmt.Errorf("%s is not a regular file", src)
-	}
-
-	source, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer Close(source, "Failed to close source file, when copy file")
-
-	destination, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer Close(destination, "Failed to close destination file, when copy file")
-	_, err = io.Copy(destination, source)
-	return err
+	return false
 }

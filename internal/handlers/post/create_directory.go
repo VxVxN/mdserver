@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/VxVxN/log"
+
 	"github.com/VxVxN/mdserver/pkg/consts"
 	e "github.com/VxVxN/mdserver/pkg/error"
 	"github.com/VxVxN/mdserver/pkg/tools"
@@ -28,22 +29,28 @@ func (ctrl *Controller) CreateDirectoryHandler(c *gin.Context) {
 		return
 	}
 
-	if errObj = ctrl.createDirectory(req); errObj != nil {
+	if errObj = ctrl.createDirectory(c, req); errObj != nil {
 		log.Error.Printf("Failed to create directory: %v", errObj.Error)
 		errObj.JsonResponse(c)
 		return
 	}
 }
 
-func (ctrl *Controller) createDirectory(req RequestCreateDirectory) *e.ErrObject {
-	pathToDir := path.Join(consts.PathToPosts, req.DirName)
+func (ctrl *Controller) createDirectory(c *gin.Context, req RequestCreateDirectory) *e.ErrObject {
+	username, err := tools.GetUserNameFromSession(c)
+	if err != nil {
+		err = fmt.Errorf("cannot get username from session: %v", err)
+		return e.NewError("Failed to get username from session", http.StatusBadRequest, err)
+	}
+
+	pathToDir := path.Join(consts.PathToPosts, username, req.DirName)
 
 	if err := os.Mkdir(pathToDir, 0777); err != nil {
 		err = fmt.Errorf("can't create directory: %v", err)
 		return e.NewError("Failed to create directory", http.StatusInternalServerError, err)
 	}
 
-	if errObj := ctrl.mongoPosts.CreateDirectory(req.DirName); errObj != nil {
+	if errObj := ctrl.mongoPosts.CreateDirectory(username, req.DirName); errObj != nil {
 		return errObj
 	}
 	return nil
