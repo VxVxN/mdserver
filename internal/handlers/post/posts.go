@@ -39,7 +39,6 @@ func (ctrl *Controller) getPosts(c *gin.Context) *e.ErrObject {
 	return nil
 }
 
-// TODO: transfer this to front
 func (ctrl *Controller) prepareHTML(c *gin.Context) ([]post.Directory, error) {
 	var directories []post.Directory
 	username, err := tools.GetUserNameFromSession(c)

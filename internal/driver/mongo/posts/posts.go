@@ -155,7 +155,10 @@ func (mgPost *MongoPosts) RenamePost(username, dirName, oldFileName, newFileName
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
 	defer cancel()
 
-	filter := bson.D{{"owner", username}, {"dir", dirName}, {"files", oldFileName}}
+	filter := bson.D{
+		{"owner", username},
+		{"dir", dirName},
+		{"files.name", oldFileName}}
 	update := bson.D{{"$set", bson.D{{"files.$.name", newFileName}}}}
 
 	_, err := mgPost.getCollection().UpdateOne(ctx, filter, update)
