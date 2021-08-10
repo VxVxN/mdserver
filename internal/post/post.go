@@ -17,7 +17,23 @@ type TemplatePost struct {
 	Title   string
 	Body    template.HTML
 	ModTime int64
-	IsAuth  bool
+}
+
+type TemplatePosts struct {
+	Title       string
+	ModTime     int64
+	IsAuth      bool
+	Directories []Directory
+}
+
+type Directory struct {
+	DirName string
+	Files   []File
+}
+
+type File struct {
+	Name       string
+	LinkToPost string
 }
 
 type Array struct {
@@ -54,7 +70,7 @@ func (p *Array) Get(md string, isEdit bool) (TemplatePost, int, error) {
 		lines := strings.Split(string(fileText), "\n")
 		body := getBody(lines, isEdit)
 
-		p.Items[md] = TemplatePost{"", template.HTML(body), info.ModTime().UnixNano(), false}
+		p.Items[md] = TemplatePost{"", template.HTML(body), info.ModTime().UnixNano()}
 	}
 	mdPost := p.Items[md]
 	return mdPost, http.StatusOK, nil

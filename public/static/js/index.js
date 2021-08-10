@@ -21,17 +21,6 @@ document.getElementById("password").onkeyup = function (event) {
     }
 };
 
-if (document.getElementById("logOut") !== null) {
-    document.getElementById("logOut").onclick = function () {
-        const successCallback = function () {
-            window.location.href = "/";
-            return false;
-        }
-
-        sendRequest("/log_out", {}, successCallback);
-    };
-}
-
 document.getElementById("signInBtn").onclick = function () {
     const usernameInput = document.getElementById("username");
     const passwordInput = document.getElementById("password");
