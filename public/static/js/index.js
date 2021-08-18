@@ -87,48 +87,6 @@ document.getElementById("cancelRenameModalBtn").onclick = function () {
     document.getElementById("renameModalName").value = "";
 };
 
-document.addEventListener('click',function(e){
-    if (e.target.classList.contains('deleteModal')) {
-        if (e.target.dataset.type === 'directory') {
-            document.getElementById("deleteModalLabel").innerText = 'Are you sure you want to delete the directory ' + e.target.dataset.name + '?';
-            document.getElementById("deleteModalTitle").innerText = "Delete the directory:" +  e.target.dataset.name;
-        } else {
-            document.getElementById("deleteModalLabel").innerText = 'Are you sure you want to delete the file ' + e.target.dataset.name + '?';
-            document.getElementById("deleteModalTitle").innerText = "Delete the file: " +  e.target.dataset.name;
-
-            document.getElementById("deleteModalBtn").dataset.dirname = e.target.dataset.dirname;
-        }
-
-        const container = document.getElementById('deleteModal');
-        const modal = new bootstrap.Modal(container);
-        modal.show();
-
-        document.getElementById("deleteModalBtn").dataset.name = e.target.dataset.name;
-        document.getElementById("deleteModalBtn").dataset.type = e.target.dataset.type;
-    }
-    if (e.target.classList.contains('createPost')) {
-        document.getElementById("createPostModalBtn").dataset.dirname = e.target.dataset.dirname;
-    }
-    if (e.target.classList.contains('renameModal')) {
-        if (e.target.dataset.type === 'directory') {
-            document.getElementById("renameModalLabel").innerText = 'Are you sure you want to rename the directory ' + e.target.dataset.name + '?';
-            document.getElementById("renameModalTitle").innerText = "Rename the directory: " +  e.target.dataset.name;
-        } else {
-            document.getElementById("renameModalLabel").innerText = 'Are you sure you want to rename the file ' + e.target.dataset.name + '?';
-            document.getElementById("renameModalTitle").innerText = "Rename the file: " +  e.target.dataset.name;
-
-            document.getElementById("renameModalBtn").dataset.dirname = e.target.dataset.dirname;
-        }
-
-        const container = document.getElementById('renameModal');
-        const modal = new bootstrap.Modal(container);
-        modal.show();
-
-        document.getElementById("renameModalBtn").dataset.name = e.target.dataset.name;
-        document.getElementById("renameModalBtn").dataset.type = e.target.dataset.type;
-    }
-})
-
 document.getElementById("deleteModalBtn").onclick = function () {
     const successCallback = function () {
         window.location.reload();
@@ -142,6 +100,27 @@ document.getElementById("deleteModalBtn").onclick = function () {
         const data = {dir_name: this.dataset.dirname, file_name: this.dataset.name};
         sendRequest("/delete_post", data, successCallback.bind(this, window));
     }
+}
+
+const renameMedals = document.getElementsByName("renameModal");
+for(let i=0; i<renameMedals.length; i++){
+    renameMedals[i].addEventListener("click", function(e){
+        rename(e);
+    }, false);
+}
+
+const deleteMedals = document.getElementsByName("deleteModal");
+for(let i=0; i<deleteMedals.length; i++){
+    deleteMedals[i].addEventListener("click", function(e){
+        del(e);
+    }, false);
+}
+
+const createPost = document.getElementsByName("createPost");
+for(let i=0; i<createPost.length; i++){
+    createPost[i].addEventListener("click", function(e){
+        document.getElementById("createPostModalBtn").dataset.dirname = e.target.dataset.dirname;
+    }, false);
 }
 
 document.getElementById("renameModalBtn").onclick = function () {
@@ -165,6 +144,9 @@ document.getElementById("renameModalBtn").onclick = function () {
 document.getElementById("createPostModalBtn").onclick = function () {
     const dirName = this.dataset.dirname;
     const fileName = document.getElementById("createPostName").value;
+    if (fileName === '') {
+        return false;
+    }
     document.getElementById("createPostName").value = '';
 
     const successCallback = function () {
@@ -174,4 +156,43 @@ document.getElementById("createPostModalBtn").onclick = function () {
 
     const data = {dir_name: dirName, file_name:fileName};
     sendRequest("/create_post", data, successCallback.bind(this, window));
+}
+
+function rename(e) {
+    if (e.target.dataset.type === 'directory') {
+        document.getElementById("renameModalLabel").innerText = 'Are you sure you want to rename the directory ' + e.target.dataset.name + '?';
+        document.getElementById("renameModalTitle").innerText = "Rename the directory: " +  e.target.dataset.name;
+    } else {
+        document.getElementById("renameModalLabel").innerText = 'Are you sure you want to rename the file ' + e.target.dataset.name + '?';
+        document.getElementById("renameModalTitle").innerText = "Rename the file: " +  e.target.dataset.name;
+
+        document.getElementById("renameModalBtn").dataset.dirname = e.target.dataset.dirname;
+    }
+
+    const container = document.getElementById('renameModal');
+    const modal = new bootstrap.Modal(container);
+    modal.show();
+
+    document.getElementById("renameModalBtn").dataset.name = e.target.dataset.name;
+    document.getElementById("renameModalBtn").dataset.type = e.target.dataset.type;
+}
+
+function del(e) {
+    console.log(e)
+    if (e.target.dataset.type === 'directory') {
+        document.getElementById("deleteModalLabel").innerText = 'Are you sure you want to delete the directory ' + e.target.dataset.name + '?';
+        document.getElementById("deleteModalTitle").innerText = "Delete the directory:" +  e.target.dataset.name;
+    } else {
+        document.getElementById("deleteModalLabel").innerText = 'Are you sure you want to delete the file ' + e.target.dataset.name + '?';
+        document.getElementById("deleteModalTitle").innerText = "Delete the file: " +  e.target.dataset.name;
+
+        document.getElementById("deleteModalBtn").dataset.dirname = e.target.dataset.dirname;
+    }
+
+    const container = document.getElementById('deleteModal');
+    const modal = new bootstrap.Modal(container);
+    modal.show();
+
+    document.getElementById("deleteModalBtn").dataset.name = e.target.dataset.name;
+    document.getElementById("deleteModalBtn").dataset.type = e.target.dataset.type;
 }
