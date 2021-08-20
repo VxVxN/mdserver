@@ -11,6 +11,16 @@
          {{ template "auth_navbar.tmpl" .}}
          <div class="container" id="container">
             <div class="row" style="text-align:left;">
+               <div class="tab-content flex-grow-1" id="myTabContent">
+                  <div class="tab-pane fade show active h-100 d-flex flex-column" id="editing" role="tabpanel" aria-labelledby="editing-tab">
+                     <div class="align-self-center m-3">
+                        <a id="cancelSavePost" class="btn btn-secondary" style="width: 120px" type="button" href="\">Go back</a>
+                        <button id="editPost" class="btn btn-primary me-2" style="width: 120px" type="button">Edit</button>
+                     </div>
+                  </div>
+                  <div class="tab-pane fade" id="preview" role="tabpanel" aria-labelledby="previewTab">
+                  </div>
+               </div>
                <div class="col-md-8 col-md-offset-2">
                   <h1>{{.Title}}</h1>
                   {{.Body}}
@@ -19,6 +29,7 @@
          </div>
       </div>>
 
+      <script src="/static/js/post.js"></script>
       <script src="/static/js/navbar.js"></script>
       <script src="/static/js/tools.js"></script>
       <script src="/static/highlight/highlight.pack.js"></script>

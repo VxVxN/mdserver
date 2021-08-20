@@ -36,7 +36,7 @@ func CopyFile(src, dst string) error {
 func GetFileNamesInDir(pathToDir string) ([]string, error) {
 	dirEntry, err := os.ReadDir(pathToDir)
 	if err != nil {
-
+		return nil, err
 	}
 	result := make([]string, 0, len(dirEntry))
 	for _, entry := range dirEntry {

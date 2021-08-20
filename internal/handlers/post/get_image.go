@@ -1,19 +1,18 @@
 package post
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"path"
 	"strings"
 
+	"github.com/VxVxN/log"
 	"github.com/gin-gonic/gin"
 
-	"github.com/VxVxN/mdserver/pkg/consts"
-	"github.com/VxVxN/mdserver/pkg/tools"
-
-	"github.com/VxVxN/log"
-
 	e "github.com/VxVxN/mdserver/pkg/error"
+	"github.com/VxVxN/mdserver/pkg/tools"
 )
 
 func (ctrl *Controller) GetImageHandler(c *gin.Context) {
@@ -31,10 +30,18 @@ func (ctrl *Controller) GetImageHandler(c *gin.Context) {
 }
 
 func (ctrl *Controller) getImage(c *gin.Context) *e.ErrObject {
-	postMD, err := ctrl.getPathToImage(c)
+	postMD, tmpPostMD, err := getPathToImage(c)
 	if err != nil {
 		err = fmt.Errorf("can't get username from session: %v", err)
 		return e.NewError("Failed to get username from session", http.StatusBadRequest, err)
+	}
+
+	if _, err = os.Stat(postMD); err != nil {
+		postMD, err = getImageFromTMPImages(c, tmpPostMD)
+		if err != nil {
+			err = fmt.Errorf("can't get image from tmp images: %v", err)
+			return e.NewError("Image not found", http.StatusNotFound, err)
+		}
 	}
 
 	c.File(postMD)
@@ -42,15 +49,33 @@ func (ctrl *Controller) getImage(c *gin.Context) *e.ErrObject {
 	return nil
 }
 
-func (ctrl *Controller) getPathToImage(c *gin.Context) (string, error) {
+func getPathToImage(c *gin.Context) (string, string, error) {
 	image := c.Param("image")
 	image = strings.Replace(image, "+", " ", -1)
 
 	username, err := tools.GetUserNameFromSession(c)
 	if err != nil {
-		return "", fmt.Errorf("cannot get username from session: %v", err)
+		return "", "", fmt.Errorf("cannot get username from session: %v", err)
 	}
 
-	postMD := path.Join(consts.PathToPosts, username, "images", image)
-	return postMD, nil
+	postMD := path.Join(tools.GetPathToImages(username), image)
+	tmpPostMD := path.Join(tools.GetPathToTMPImages(username))
+
+	return postMD, tmpPostMD, nil
+}
+
+func getImageFromTMPImages(c *gin.Context, pathToTMP string) (string, error) {
+	image := c.Param("image")
+	image = strings.Replace(image, "+", " ", -1)
+
+	files, err := tools.GetFileNamesInDir(pathToTMP)
+	if err != nil {
+		return "", fmt.Errorf("can't get files names from tmp images: %v", err)
+	}
+	for _, file := range files {
+		if strings.HasPrefix(file, image) {
+			return path.Join(pathToTMP, file), nil
+		}
+	}
+	return "", errors.New("image not found")
 }
