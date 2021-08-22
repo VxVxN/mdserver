@@ -20,6 +20,7 @@ import (
 	"github.com/VxVxN/mdserver/internal/glob"
 	"github.com/VxVxN/mdserver/internal/handlers/login"
 	"github.com/VxVxN/mdserver/internal/handlers/post"
+	"github.com/VxVxN/mdserver/internal/handlers/share"
 	"github.com/VxVxN/mdserver/pkg/config"
 	"github.com/VxVxN/mdserver/pkg/consts"
 	e "github.com/VxVxN/mdserver/pkg/error"
@@ -32,6 +33,7 @@ type mdServer struct {
 
 	postCtrl  *post.Controller
 	loginCtrl *login.Controller
+	shareCtrl *share.Controller
 }
 
 func main() {
@@ -58,17 +60,22 @@ func main() {
 		authRouter.POST("/delete_post", server.postCtrl.DeletePostHandler)
 		authRouter.POST("/preview", server.postCtrl.PreviewPostHandler)
 
+		authRouter.POST("/share_link", server.shareCtrl.SharePostHandler)
+		authRouter.POST("/delete_share_link", server.shareCtrl.DeleteShareLinkHandler)
+		authRouter.GET("/share_links", server.shareCtrl.ShareLinksHandler)
+
 		authRouter.POST("/create_directory", server.postCtrl.CreateDirectoryHandler)
 		authRouter.POST("/rename_directory", server.postCtrl.RenameDirectoryHandler)
 		authRouter.POST("/delete_directory", server.postCtrl.DeleteDirectoryHandler)
 
 		authRouter.POST("/edit/:dir/:file/image_upload", server.postCtrl.ImageUploadHandler)
-		authRouter.GET("/images/:image", server.postCtrl.GetImageHandler)
 		authRouter.GET("/edit/:dir/:file", server.postCtrl.EditPostHandler)
 		authRouter.GET("/:dir/:file", server.postCtrl.PostHandler)
 	}
 
 	server.router.GET("/", server.postCtrl.PostsHandler)
+	server.router.GET("/share/:username/:id", server.shareCtrl.GetSharePostHandler)
+	server.router.GET("/images/:image", server.postCtrl.GetImageHandler)
 
 	server.router.NoRoute(noRouteHandler)
 
@@ -81,6 +88,7 @@ func main() {
 
 func InitServer() (*mdServer, error) {
 	var err error
+	gin.SetMode(gin.ReleaseMode)
 	server := mdServer{router: gin.Default()}
 
 	pathConfig := path.Join(glob.WorkDir, "mdserver.yaml")
@@ -122,6 +130,7 @@ func InitServer() (*mdServer, error) {
 	}
 
 	server.loginCtrl = login.NewController(server.MongoClient)
+	server.shareCtrl = share.NewController(server.MongoClient)
 
 	return &server, nil
 }

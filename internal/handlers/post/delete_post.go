@@ -68,9 +68,8 @@ func (ctrl *Controller) removeImages(username, dirName, fileName string) error {
 	if err != nil {
 		return fmt.Errorf("cannot get images from mongo: %v", err)
 	}
-	pathToImageDir := path.Join(consts.PathToPosts, username, "images")
 	for _, image := range images {
-		pathToDestination := path.Join(pathToImageDir, image.UUID)
+		pathToDestination := path.Join(consts.PathToImages, image.UUID)
 		if err = os.Remove(pathToDestination); err != nil {
 			return fmt.Errorf("cannot remove image: %v", err)
 		}

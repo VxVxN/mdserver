@@ -37,6 +37,22 @@ document.getElementById("editingTab").onclick = function () {
     document.getElementById("editing").classList.remove('d-none');
 }
 
+document.getElementById("shareModalBtn").onclick = function () {
+    const dirName = getDirName();
+    const fileName = getFileName();
+
+    const data = {
+        dir_name:dirName,
+        file_name: fileName,
+    };
+    const successCallback = function (resp) {
+        const response = JSON.parse(resp);
+        alert(response.link)
+        return false;
+    }
+    sendRequest("/share_link", data, successCallback);
+}
+
 document.getElementById("fileUploadBtn").onclick = function () {
     const textarea = document.getElementById('postText');
     cursorLocation = textarea.selectionStart;

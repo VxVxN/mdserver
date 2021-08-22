@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/VxVxN/mdserver/internal/post"
 	"github.com/VxVxN/mdserver/pkg/consts"
 	"github.com/VxVxN/mdserver/pkg/tools"
 
@@ -17,7 +18,8 @@ import (
 )
 
 func (ctrl *Controller) PostHandler(c *gin.Context) {
-	if errObj := ctrl.getPost(c); errObj != nil {
+	templatePost, errObj := ctrl.getPost(c)
+	if errObj != nil {
 		log.Error.Printf("Failed to get post: %v", errObj.Error)
 		if errObj.Status == http.StatusNotFound {
 			c.HTML(http.StatusNotFound, "error.tmpl", map[string]interface{}{
@@ -28,23 +30,23 @@ func (ctrl *Controller) PostHandler(c *gin.Context) {
 		errObj.JsonResponse(c)
 		return
 	}
+
+	c.HTML(200, "post.tmpl", templatePost)
 }
 
-func (ctrl *Controller) getPost(c *gin.Context) *e.ErrObject {
+func (ctrl *Controller) getPost(c *gin.Context) (*post.TemplatePost, *e.ErrObject) {
 	postMD, err := ctrl.getPathToPostMD(c)
 	if err != nil {
 		err = fmt.Errorf("can't get username from session: %v", err)
-		return e.NewError("Failed to get username from session", http.StatusBadRequest, err)
+		return nil, e.NewError("Failed to get username from session", http.StatusBadRequest, err)
 	}
 
 	templatePost, status, err := ctrl.posts.Get(postMD, false)
 	if err != nil {
 		err = fmt.Errorf("can't get post: %v", err)
-		return e.NewError("Failed to get post", status, err)
+		return nil, e.NewError("Failed to get post", status, err)
 	}
-	c.HTML(200, "post.tmpl", templatePost)
-
-	return nil
+	return &templatePost, nil
 }
 
 func (ctrl *Controller) getPathToPostMD(c *gin.Context) (string, error) {

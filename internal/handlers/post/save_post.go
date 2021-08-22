@@ -112,7 +112,7 @@ func (ctrl *Controller) saveImages(c *gin.Context, text string) ([]posts.Image, 
 		})
 
 		pathToSource := path.Join(pathToTmpImages, imageUUID+"_"+imageName)
-		pathToDestination := path.Join(consts.PathToPosts, username, "images", imageUUID)
+		pathToDestination := path.Join(consts.PathToImages, imageUUID)
 		if err = tools.CopyFile(pathToSource, pathToDestination); err != nil {
 			log.Debug.Printf("Failed to copy file: %v", err)
 		}

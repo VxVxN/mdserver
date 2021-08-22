@@ -178,7 +178,6 @@ function rename(e) {
 }
 
 function del(e) {
-    console.log(e)
     if (e.target.dataset.type === 'directory') {
         document.getElementById("deleteModalLabel").innerText = 'Are you sure you want to delete the directory ' + e.target.dataset.name + '?';
         document.getElementById("deleteModalTitle").innerText = "Delete the directory:" +  e.target.dataset.name;

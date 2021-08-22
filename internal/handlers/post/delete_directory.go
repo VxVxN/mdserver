@@ -61,7 +61,7 @@ func (ctrl *Controller) deleteDirectory(c *gin.Context, req RequestDeleteDirecto
 		return e.NewError("Failed to delete directory", http.StatusInternalServerError, err)
 	}
 
-	if err = removeImages(username, dir); err != nil {
+	if err = removeImages(dir); err != nil {
 		err = fmt.Errorf("can't delete images bind with dir: %v", err)
 		return e.NewError("Failed to delete images bind with dir", http.StatusInternalServerError, err)
 	}
@@ -69,12 +69,11 @@ func (ctrl *Controller) deleteDirectory(c *gin.Context, req RequestDeleteDirecto
 	return nil
 }
 
-func removeImages(username string, dir *posts.Directory) error {
+func removeImages(dir *posts.Directory) error {
 	var err error
-	pathToImages := path.Join(consts.PathToPosts, username, "images")
 	for _, file := range dir.Files {
 		for _, image := range file.Images {
-			pathToImage := path.Join(pathToImages, image.UUID)
+			pathToImage := path.Join(consts.PathToImages, image.UUID)
 			if err = os.Remove(pathToImage); err != nil {
 				log.Warning.Printf("Failed to remove image: %v", err)
 				return err

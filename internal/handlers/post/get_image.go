@@ -11,6 +11,7 @@ import (
 	"github.com/VxVxN/log"
 	"github.com/gin-gonic/gin"
 
+	"github.com/VxVxN/mdserver/pkg/consts"
 	e "github.com/VxVxN/mdserver/pkg/error"
 	"github.com/VxVxN/mdserver/pkg/tools"
 )
@@ -30,14 +31,14 @@ func (ctrl *Controller) GetImageHandler(c *gin.Context) {
 }
 
 func (ctrl *Controller) getImage(c *gin.Context) *e.ErrObject {
-	postMD, tmpPostMD, err := getPathToImage(c)
+	postMD, err := getPathToImage(c)
 	if err != nil {
 		err = fmt.Errorf("can't get username from session: %v", err)
 		return e.NewError("Failed to get username from session", http.StatusBadRequest, err)
 	}
 
 	if _, err = os.Stat(postMD); err != nil {
-		postMD, err = getImageFromTMPImages(c, tmpPostMD)
+		postMD, err = getImageFromTMPImages(c)
 		if err != nil {
 			err = fmt.Errorf("can't get image from tmp images: %v", err)
 			return e.NewError("Image not found", http.StatusNotFound, err)
@@ -49,24 +50,25 @@ func (ctrl *Controller) getImage(c *gin.Context) *e.ErrObject {
 	return nil
 }
 
-func getPathToImage(c *gin.Context) (string, string, error) {
+func getPathToImage(c *gin.Context) (string, error) {
+	image := c.Param("image")
+	image = strings.Replace(image, "+", " ", -1)
+
+	postMD := path.Join(consts.PathToImages, image)
+
+	return postMD, nil
+}
+
+func getImageFromTMPImages(c *gin.Context) (string, error) {
 	image := c.Param("image")
 	image = strings.Replace(image, "+", " ", -1)
 
 	username, err := tools.GetUserNameFromSession(c)
 	if err != nil {
-		return "", "", fmt.Errorf("cannot get username from session: %v", err)
+		return "", fmt.Errorf("cannot get username from session: %v", err)
 	}
 
-	postMD := path.Join(tools.GetPathToImages(username), image)
-	tmpPostMD := path.Join(tools.GetPathToTMPImages(username))
-
-	return postMD, tmpPostMD, nil
-}
-
-func getImageFromTMPImages(c *gin.Context, pathToTMP string) (string, error) {
-	image := c.Param("image")
-	image = strings.Replace(image, "+", " ", -1)
+	pathToTMP := path.Join(tools.GetPathToTMPImages(username))
 
 	files, err := tools.GetFileNamesInDir(pathToTMP)
 	if err != nil {
