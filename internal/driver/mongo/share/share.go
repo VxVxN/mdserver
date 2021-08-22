@@ -85,8 +85,7 @@ func (ms *MongoShare) GetLinks(username string) (*Share, error) {
 
 	var share Share
 	if err := result.Decode(&share); err != nil {
-		err = fmt.Errorf("error decode share link: %v", err)
-		return nil, err
+		return new(Share), nil // share link not found in mongo
 	}
 
 	return &share, nil

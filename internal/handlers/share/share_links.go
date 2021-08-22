@@ -27,7 +27,7 @@ func (ctrl *Controller) ShareLinksHandler(c *gin.Context) {
 
 	resp, errObj := ctrl.getShareLinks(c)
 	if errObj != nil {
-		log.Error.Printf("Failed to share post: %v", errObj.Error)
+		log.Error.Printf("Failed to get share links: %v", errObj.Error)
 		errObj.JsonResponse(c)
 		return
 	}
