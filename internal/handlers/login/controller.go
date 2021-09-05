@@ -1,21 +1,19 @@
 package login
 
 import (
-	"go.mongodb.org/mongo-driver/mongo"
-
-	"github.com/VxVxN/mdserver/internal/driver/mongo/users"
+	"github.com/VxVxN/mdserver/internal/driver/mongo/interfaces"
 	e "github.com/VxVxN/mdserver/pkg/error"
 )
 
 type Controller struct {
 	e.ErrResponseController
 
-	mongoUsers *users.MongoUsers
+	mongoUsers interfaces.MongoUsers
 }
 
-func NewController(mongoClient *mongo.Client) *Controller {
+func NewController(mongoUsers interfaces.MongoUsers) *Controller {
 	ctrl := &Controller{
-		mongoUsers: users.Init(mongoClient),
+		mongoUsers: mongoUsers,
 	}
 	return ctrl
 }

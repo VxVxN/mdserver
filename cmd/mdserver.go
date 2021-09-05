@@ -14,9 +14,12 @@ import (
 	sessionMongo "github.com/gin-contrib/sessions/mongo"
 	"github.com/gin-gonic/gin"
 	"github.com/globalsign/mgo"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 
+	_interface "github.com/VxVxN/mdserver/internal/driver/mongo/interfaces/client"
+	mongoClient "github.com/VxVxN/mdserver/internal/driver/mongo/mongo_client"
+	"github.com/VxVxN/mdserver/internal/driver/mongo/posts"
+	mShare "github.com/VxVxN/mdserver/internal/driver/mongo/share"
+	"github.com/VxVxN/mdserver/internal/driver/mongo/users"
 	"github.com/VxVxN/mdserver/internal/glob"
 	"github.com/VxVxN/mdserver/internal/handlers/login"
 	"github.com/VxVxN/mdserver/internal/handlers/post"
@@ -29,7 +32,7 @@ import (
 
 type mdServer struct {
 	router      *gin.Engine
-	MongoClient *mongo.Client
+	MongoClient _interface.Client
 
 	postCtrl  *post.Controller
 	loginCtrl *login.Controller
@@ -105,13 +108,17 @@ func InitServer() (*mdServer, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://mongo:27017"))
-	if err != nil {
+
+	mongoURI := "mongodb://mongo:27017"
+
+	client := mongoClient.NewClient()
+	if err = client.Connect(ctx, mongoURI); err != nil {
 		log.Fatal.Printf("Failed to connect to mongo db: %v", err)
 		return nil, fmt.Errorf("can't connect to mongo db: %v", err)
 	}
+	server.MongoClient = client
 
-	session, err := mgo.Dial("mongodb://mongo:27017")
+	session, err := mgo.Dial(mongoURI)
 	if err != nil {
 		log.Fatal.Printf("Failed to connect to session mongo db: %v", err)
 		return nil, fmt.Errorf("can't connect to session mongo db: %v", err)
@@ -121,16 +128,19 @@ func InitServer() (*mdServer, error) {
 	store := sessionMongo.NewStore(c, config.Cfg.SessionAge*60, true, []byte(config.Cfg.SessionSecret))
 	server.router.Use(ginSessions.Sessions("mdSession", store))
 
-	server.MongoClient = client
+	mongoDB := server.MongoClient.Database("mdServer")
+	mongoUsers := users.Init(mongoDB)
+	mongoShare := mShare.Init(mongoDB)
+	mongoPosts := posts.Init(mongoDB)
 
-	server.postCtrl, err = post.NewController(server.MongoClient)
+	server.postCtrl, err = post.NewController(mongoPosts)
 	if err != nil {
 		log.Fatal.Printf("Failed init post controller : %v", err)
 		return nil, fmt.Errorf("error on init post controller: %v", err)
 	}
 
-	server.loginCtrl = login.NewController(server.MongoClient)
-	server.shareCtrl = share.NewController(server.MongoClient)
+	server.loginCtrl = login.NewController(mongoUsers)
+	server.shareCtrl = share.NewController(mongoShare)
 
 	return &server, nil
 }

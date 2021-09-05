@@ -19,13 +19,16 @@ github.com/aws/aws-sdk-go/internal/strings
 github.com/aws/aws-sdk-go/internal/sync/singleflight
 github.com/aws/aws-sdk-go/private/protocol
 github.com/aws/aws-sdk-go/private/protocol/rest
+# github.com/davecgh/go-spew v1.1.1
+github.com/davecgh/go-spew/spew
 # github.com/gin-contrib/sessions v0.0.3
 ## explicit
 github.com/gin-contrib/sessions
+github.com/gin-contrib/sessions/cookie
 github.com/gin-contrib/sessions/mongo
 # github.com/gin-contrib/sse v0.1.0
 github.com/gin-contrib/sse
-# github.com/gin-gonic/gin v1.7.2
+# github.com/gin-gonic/gin v1.7.4
 ## explicit
 github.com/gin-gonic/gin
 github.com/gin-gonic/gin/binding
@@ -39,12 +42,12 @@ github.com/globalsign/mgo/bson
 github.com/globalsign/mgo/internal/json
 github.com/globalsign/mgo/internal/sasl
 github.com/globalsign/mgo/internal/scram
-# github.com/go-playground/locales v0.13.0
+# github.com/go-playground/locales v0.14.0
 github.com/go-playground/locales
 github.com/go-playground/locales/currency
-# github.com/go-playground/universal-translator v0.17.0
+# github.com/go-playground/universal-translator v0.18.0
 github.com/go-playground/universal-translator
-# github.com/go-playground/validator/v10 v10.8.0
+# github.com/go-playground/validator/v10 v10.9.0
 ## explicit
 github.com/go-playground/validator/v10
 # github.com/go-stack/stack v1.8.0
@@ -87,6 +90,8 @@ github.com/modern-go/concurrent
 github.com/modern-go/reflect2
 # github.com/pkg/errors v0.9.1
 github.com/pkg/errors
+# github.com/pmezard/go-difflib v1.0.0
+github.com/pmezard/go-difflib/difflib
 # github.com/russross/blackfriday v1.6.0
 ## explicit
 github.com/russross/blackfriday
@@ -95,6 +100,8 @@ github.com/russross/blackfriday
 github.com/satori/go.uuid
 # github.com/stretchr/testify v1.7.0
 ## explicit
+github.com/stretchr/testify/assert
+github.com/stretchr/testify/require
 # github.com/ugorji/go v1.2.6
 ## explicit
 # github.com/ugorji/go/codec v1.2.6
@@ -141,18 +148,21 @@ go.mongodb.org/mongo-driver/x/mongo/driver/session
 go.mongodb.org/mongo-driver/x/mongo/driver/topology
 go.mongodb.org/mongo-driver/x/mongo/driver/uuid
 go.mongodb.org/mongo-driver/x/mongo/driver/wiremessage
-# golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
+# golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
+## explicit
 golang.org/x/crypto/ocsp
 golang.org/x/crypto/pbkdf2
 golang.org/x/crypto/sha3
 # golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore
-# golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c
+# golang.org/x/sys v0.0.0-20210831042530-f4d43177bf5e
+## explicit
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
-# golang.org/x/text v0.3.6
+# golang.org/x/text v0.3.7
+## explicit
 golang.org/x/text/internal/language
 golang.org/x/text/internal/language/compact
 golang.org/x/text/internal/tag
@@ -191,3 +201,5 @@ google.golang.org/protobuf/types/descriptorpb
 # gopkg.in/yaml.v2 v2.4.0
 ## explicit
 gopkg.in/yaml.v2
+# gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
+gopkg.in/yaml.v3

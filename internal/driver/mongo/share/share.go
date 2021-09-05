@@ -13,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
+	"github.com/VxVxN/mdserver/internal/driver/mongo/interfaces/client"
 	"github.com/VxVxN/mdserver/pkg/config"
 	e "github.com/VxVxN/mdserver/pkg/error"
 )
@@ -20,7 +21,7 @@ import (
 const timeout = 5
 
 type MongoShare struct {
-	mongoClient *mongo.Client
+	db client.Database
 }
 
 type Share struct {
@@ -36,12 +37,12 @@ type Link struct {
 	// Expire   time.Time `bson:"expire"`
 }
 
-func Init(mongoClient *mongo.Client) *MongoShare {
-	return &MongoShare{mongoClient: mongoClient}
+func Init(db client.Database) *MongoShare {
+	return &MongoShare{db: db}
 }
 
-func (ms *MongoShare) getCollection() *mongo.Collection {
-	return ms.mongoClient.Database("mdServer").Collection("share")
+func (ms *MongoShare) getCollection() client.Collection {
+	return ms.db.Collection("share")
 }
 
 func (ms *MongoShare) GenerateLink(username, dirName, fileName string) (string, *e.ErrObject) {

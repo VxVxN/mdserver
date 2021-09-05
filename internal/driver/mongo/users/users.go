@@ -9,15 +9,14 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 
+	"github.com/VxVxN/mdserver/internal/driver/mongo/interfaces/client"
 	e "github.com/VxVxN/mdserver/pkg/error"
-
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 const timeout = 5
 
 type MongoUsers struct {
-	mongoClient *mongo.Client
+	db client.Database
 }
 
 type User struct {
@@ -26,12 +25,12 @@ type User struct {
 	Create   time.Time `bson:"create"`
 }
 
-func Init(mongoClient *mongo.Client) *MongoUsers {
-	return &MongoUsers{mongoClient: mongoClient}
+func Init(db client.Database) *MongoUsers {
+	return &MongoUsers{db: db}
 }
 
-func (ms *MongoUsers) getCollection() *mongo.Collection {
-	return ms.mongoClient.Database("mdServer").Collection("users")
+func (ms *MongoUsers) getCollection() client.Collection {
+	return ms.db.Collection("users")
 }
 
 func (ms *MongoUsers) Create(username, password string) *e.ErrObject {

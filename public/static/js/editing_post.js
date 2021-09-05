@@ -38,8 +38,11 @@ document.getElementById("editingTab").onclick = function () {
 }
 
 document.getElementById("shareModalBtn").onclick = function () {
-    const dirName = getDirName();
-    const fileName = getFileName();
+    let dirName = getDirName();
+    let fileName = getFileName();
+
+    dirName = dirName.replaceAll('+', ' ')
+    fileName = fileName.replaceAll('+', ' ')
 
     const data = {
         dir_name:dirName,

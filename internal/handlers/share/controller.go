@@ -1,9 +1,7 @@
 package share
 
 import (
-	"go.mongodb.org/mongo-driver/mongo"
-
-	"github.com/VxVxN/mdserver/internal/driver/mongo/share"
+	"github.com/VxVxN/mdserver/internal/driver/mongo/interfaces"
 	"github.com/VxVxN/mdserver/internal/post"
 	e "github.com/VxVxN/mdserver/pkg/error"
 )
@@ -13,12 +11,12 @@ type Controller struct {
 
 	posts *post.Array
 
-	mongoShare *share.MongoShare
+	mongoShare interfaces.MongoShare
 }
 
-func NewController(mongoClient *mongo.Client) *Controller {
+func NewController(mongoShare interfaces.MongoShare) *Controller {
 	return &Controller{
 		posts:      post.NewPostArray(),
-		mongoShare: share.Init(mongoClient),
+		mongoShare: mongoShare,
 	}
 }

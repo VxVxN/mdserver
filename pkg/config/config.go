@@ -37,3 +37,13 @@ func InitConfig(ConfigName string) (err error) {
 	}
 	return nil
 }
+
+func InitTestConfig() {
+	Cfg = &config{
+		Listen:        "",
+		LevelLog:      "",
+		SessionAge:    120,
+		SessionSecret: "secret",
+		Domain:        "testDomain.com",
+	}
+}

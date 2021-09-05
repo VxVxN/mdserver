@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/VxVxN/mdserver/internal/driver/mongo/interfaces/client"
 	e "github.com/VxVxN/mdserver/pkg/error"
 
 	"github.com/VxVxN/mdserver/pkg/tools"
@@ -17,7 +18,7 @@ import (
 const timeout = 5
 
 type MongoPosts struct {
-	mongoClient *mongo.Client
+	db client.Database
 }
 
 type Directory struct {
@@ -36,12 +37,12 @@ type Image struct {
 	Name string `bson:"name"`
 }
 
-func Init(mongoClient *mongo.Client) *MongoPosts {
-	return &MongoPosts{mongoClient: mongoClient}
+func Init(db client.Database) *MongoPosts {
+	return &MongoPosts{db: db}
 }
 
-func (mgPost *MongoPosts) getCollection() *mongo.Collection {
-	return mgPost.mongoClient.Database("mdServer").Collection("posts")
+func (mgPost *MongoPosts) getCollection() client.Collection {
+	return mgPost.db.Collection("posts")
 }
 
 func (mgPost *MongoPosts) GetDirectories(username string) ([]*Directory, error) {
