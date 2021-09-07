@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-contrib/sessions"
 
@@ -44,7 +45,7 @@ func GetUserNameFromSession(c *gin.Context) (string, error) {
 		return "", fmt.Errorf("incorrect username in session, expected string, actual: %T", usernameI)
 	}
 
-	return username, nil
+	return strings.ToLower(username), nil
 }
 
 func IsAuthUser(c *gin.Context) bool {

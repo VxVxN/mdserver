@@ -2,6 +2,7 @@ package login
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/VxVxN/log"
 	"github.com/gin-contrib/sessions"
@@ -35,7 +36,7 @@ func (ctrl *Controller) SignIn(c *gin.Context) {
 	sessionToken := uuid.NewV4().String()
 
 	session.Set("token", sessionToken)
-	session.Set("username", req.Username)
+	session.Set("username", strings.ToLower(req.Username))
 
 	if err := session.Save(); err != nil {
 		e.NewError("Failed to save session", http.StatusInternalServerError, nil).JsonResponse(c)

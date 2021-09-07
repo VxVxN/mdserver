@@ -9,18 +9,6 @@ if (document.getElementById("signIn") !== null) {
     };
 }
 
-document.getElementById("username").onkeyup = function (event) {
-    if (event.key === 'Enter') {
-        document.getElementById("signInBtn").click();
-    }
-};
-
-document.getElementById("password").onkeyup = function (event) {
-    if (event.key === 'Enter') {
-        document.getElementById("signInBtn").click();
-    }
-};
-
 document.getElementById("signInBtn").onclick = function () {
     const usernameInput = document.getElementById("username");
     const passwordInput = document.getElementById("password");

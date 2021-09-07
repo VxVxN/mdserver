@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"path"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -27,7 +28,7 @@ func (ctrl *Controller) GetSharePostHandler(c *gin.Context) {
 }
 
 func (ctrl *Controller) getTemplateSharePost(c *gin.Context) (*post.TemplatePost, *e.ErrObject) {
-	username := c.Param("username")
+	username := strings.ToLower(c.Param("username"))
 
 	shareLinks, err := ctrl.mongoShare.GetLinks(username)
 	if err != nil {

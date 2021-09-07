@@ -18,5 +18,32 @@
             <!-- /.navbar-collapse -->
         </div>
         <!-- /.container-fluid -->
+        <!-- sign in modal -->
+        <div class="modal fade" id="signInModal" tabindex="-1" aria-labelledby="signInModal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Sign in</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3 has-validation">
+                                <label for="username" class="col-form-label">Username:</label>
+                                <input type="text" class="form-control" id="username">
+                                <label for="password" class="col-form-label">Password:</label>
+                                <input type="password" class="form-control" id="password">
+                                <div class="invalid-feedback" id="errorDiv"></div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancelSignIn">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="signInBtn">Sign in</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end sign in modal -->
     </nav>
 {{ end }}
