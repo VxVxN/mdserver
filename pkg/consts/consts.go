@@ -16,4 +16,5 @@ var (
 	PathToImages       = path.Join(PathToPosts, "images")
 	PathToStatic       = path.Join(glob.WorkDir + "/public/static")
 	PathToStaticImages = path.Join(PathToStatic, "images")
+	PathToMarkdown     = path.Join(PathToStatic, "markdown")
 )

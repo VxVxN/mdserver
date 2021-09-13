@@ -21,6 +21,7 @@ import (
 	mShare "github.com/VxVxN/mdserver/internal/driver/mongo/share"
 	"github.com/VxVxN/mdserver/internal/driver/mongo/users"
 	"github.com/VxVxN/mdserver/internal/glob"
+	"github.com/VxVxN/mdserver/internal/handlers/common"
 	"github.com/VxVxN/mdserver/internal/handlers/login"
 	"github.com/VxVxN/mdserver/internal/handlers/post"
 	"github.com/VxVxN/mdserver/internal/handlers/share"
@@ -34,9 +35,10 @@ type mdServer struct {
 	router      *gin.Engine
 	MongoClient _interface.Client
 
-	postCtrl  *post.Controller
-	loginCtrl *login.Controller
-	shareCtrl *share.Controller
+	postCtrl   *post.Controller
+	loginCtrl  *login.Controller
+	shareCtrl  *share.Controller
+	commonCtrl *common.Controller
 }
 
 func main() {
@@ -79,6 +81,7 @@ func main() {
 	server.router.GET("/", server.postCtrl.PostsHandler)
 	server.router.GET("/share/:username/:id", server.shareCtrl.GetSharePostHandler)
 	server.router.GET("/images/:image", server.postCtrl.GetImageHandler)
+	server.router.GET("/help", server.commonCtrl.Help)
 
 	server.router.NoRoute(noRouteHandler)
 
@@ -141,6 +144,7 @@ func InitServer() (*mdServer, error) {
 
 	server.loginCtrl = login.NewController(mongoUsers)
 	server.shareCtrl = share.NewController(mongoShare)
+	server.commonCtrl = common.NewController()
 
 	return &server, nil
 }

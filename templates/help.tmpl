@@ -1,0 +1,30 @@
+﻿<!doctype html>
+<html>
+   <header>
+      {{ template "header.tmpl" .}}
+      <link href="/static/highlight/styles/ir_black.css" rel="stylesheet" media="screen">
+   </header>
+
+   <body class="vh-100">
+      <script src="/static/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+      <div class="d-flex flex-column" style="height: 100vh">
+         {{ if .IsAuth }}
+            {{ template "auth_navbar.tmpl" .}}
+         {{ else }}
+            {{ template "navbar.tmpl" .}}
+         {{ end }}
+         <div class="container" id="container">
+               <div class="col-md-8 col-md-offset-2">
+                  <h1>{{.Title}}</h1>
+                  {{.Body}}
+               </div>
+            </div>
+         </div>
+      </div>>
+
+      <script src="/static/js/navbar.js"></script>
+      <script src="/static/js/tools.js"></script>
+      <script src="/static/highlight/highlight.pack.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+   </body>
+</html>
