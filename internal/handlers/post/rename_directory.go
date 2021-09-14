@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"path/filepath"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -58,38 +56,5 @@ func (ctrl *Controller) renameDirectory(c *gin.Context, req RequestRenameDirecto
 		return e.NewError("Failed to rename directory", http.StatusInternalServerError, err)
 	}
 
-	if err = renameImagesByPrefix(username, req.OldDirName, req.NewDirName); err != nil {
-		err = fmt.Errorf("can't delete images bind with dir: %v", err)
-		return e.NewError("Failed to delete images bind with dir", http.StatusInternalServerError, err)
-	}
-
 	return nil
-}
-
-func renameImagesByPrefix(username, olgPrefix, newPrefix string) error {
-	pathToImages := path.Join(consts.PathToPosts, username, "images")
-	err := filepath.WalkDir(
-		pathToImages, func(path string, info os.DirEntry, err error) error {
-			if err != nil {
-				log.Warning.Printf("Failed to walk through dir: %v", err)
-				return err
-			}
-			if info.IsDir() {
-				return nil
-			}
-			pathToImage := filepath.Join(pathToImages, info.Name())
-
-			if strings.HasPrefix(info.Name(), olgPrefix) {
-				newName := strings.Replace(info.Name(), olgPrefix, newPrefix, 1)
-				newPath := filepath.Join(pathToImages, newName)
-				if err = os.Rename(pathToImage, newPath); err != nil {
-					log.Warning.Printf("Failed to rename image: %v", err)
-					return err
-				}
-			}
-
-			return nil
-		},
-	)
-	return err
 }

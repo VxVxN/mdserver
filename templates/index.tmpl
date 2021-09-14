@@ -18,7 +18,7 @@
                 <div class="col-md-8 col-md-offset-2 d-flex flex-column w-100">
                     <h1>{{.Title}}</h1>
                     {{if .IsAuth}}
-                        <button type="button" class="btn btn-outline-dark align-self-start" href="#" data-bs-toggle="modal" data-bs-target="#createDirectoryModal">Create directory</button>
+                        <button type="button" id="createDirectoryBtn" class="btn btn-outline-dark align-self-start" href="#" data-bs-toggle="modal" data-bs-target="#createDirectoryModal">Create directory</button>
                         {{ range .Directories }}
                             {{ $DirName := .DirName }}
                             <div class="d-inline-block">

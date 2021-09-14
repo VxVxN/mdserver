@@ -1,11 +1,11 @@
-const container = document.getElementById('signInModal');
-const signInModal = new bootstrap.Modal(container);
+const signInContainer = document.getElementById('signInModal');
+const signInModalIndex = new bootstrap.Modal(signInContainer);
 
 if (document.getElementById("signIn") !== null) {
     document.getElementById("signIn").onclick = function () {
         document.getElementById("password").classList.remove("is-invalid");
         document.getElementById("username").classList.remove("is-invalid");
-        signInModal.show();
+        signInModalIndex.show();
     };
 }
 
@@ -17,8 +17,6 @@ document.getElementById("signInBtn").onclick = function () {
 
     const username = usernameInput.value;
     const password = passwordInput.value;
-
-    document.getElementById("createPostName").value = '';
 
     if (username === "") {
         errorDiv.innerText = "The username cannot be empty";
@@ -33,7 +31,7 @@ document.getElementById("signInBtn").onclick = function () {
     }
 
     const successCallback = function () {
-        signInModal.hide();
+        signInModalIndex.hide();
         window.location.href = "/";
         return false;
     }
@@ -52,7 +50,6 @@ document.getElementById("createDirectory").onclick = function () {
     if (directoryName === '') {
         return;
     }
-    document.getElementById("directoryName").value = "";
 
     const successCallback = function () {
         window.location.reload();
@@ -63,16 +60,8 @@ document.getElementById("createDirectory").onclick = function () {
     sendRequest("/create_directory", data, successCallback.bind(this, window));
 };
 
-document.getElementById("cancelSaveDirectory").onclick = function () {
-    document.getElementById("directoryName").value = "";
-};
-
-document.getElementById("cancelPostModalBtn").onclick = function () {
-    document.getElementById("createPostName").value = "";
-};
-
-document.getElementById("cancelRenameModalBtn").onclick = function () {
-    document.getElementById("renameModalName").value = "";
+document.getElementById("createDirectoryBtn").onclick = function () {
+    document.getElementById("directoryName").value = '';
 };
 
 document.getElementById("deleteModalBtn").onclick = function () {
@@ -107,6 +96,7 @@ for(let i=0; i<deleteMedals.length; i++){
 const createPost = document.getElementsByName("createPost");
 for(let i=0; i<createPost.length; i++){
     createPost[i].addEventListener("click", function(e){
+        document.getElementById("createPostName").value = '';
         document.getElementById("createPostModalBtn").dataset.dirname = e.target.dataset.dirname;
     }, false);
 }
@@ -115,7 +105,6 @@ document.getElementById("renameModalBtn").onclick = function () {
     const newName = document.getElementById("renameModalName").value;
 
     const successCallback = function () {
-        document.getElementById("renameModalName").value = "";
         window.location.reload();
         return false;
     }
@@ -135,7 +124,6 @@ document.getElementById("createPostModalBtn").onclick = function () {
     if (fileName === '') {
         return false;
     }
-    document.getElementById("createPostName").value = '';
 
     const successCallback = function () {
         window.location.reload();
@@ -147,6 +135,7 @@ document.getElementById("createPostModalBtn").onclick = function () {
 }
 
 function rename(e) {
+    document.getElementById("renameModalName").value = '';
     if (e.target.dataset.type === 'directory') {
         document.getElementById("renameModalLabel").innerText = 'Are you sure you want to rename the directory ' + e.target.dataset.name + '?';
         document.getElementById("renameModalTitle").innerText = "Rename the directory: " +  e.target.dataset.name;

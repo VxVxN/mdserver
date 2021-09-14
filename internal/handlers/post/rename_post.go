@@ -60,12 +60,5 @@ func (ctrl *Controller) renamePost(c *gin.Context, req RequestRenamePost) *e.Err
 		return e.NewError("Failed to rename post", http.StatusInternalServerError, err)
 	}
 
-	oldPrefix := req.DirName + "_" + req.OldFileName
-	newPrefix := req.DirName + "_" + req.NewFileName
-	if err = renameImagesByPrefix(username, oldPrefix, newPrefix); err != nil {
-		err = fmt.Errorf("can't delete images bind with file: %v", err)
-		return e.NewError("Failed to delete images bind with file", http.StatusInternalServerError, err)
-	}
-
 	return nil
 }
