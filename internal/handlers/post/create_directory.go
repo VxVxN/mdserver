@@ -19,6 +19,23 @@ type RequestCreateDirectory struct {
 	DirName string `json:"name" binding:"required"`
 }
 
+/**
+ * @api {post} /create_directory Create a directory
+ * @apiName CreateDirectoryHandler
+ * @apiGroup post
+ *
+ * @apiParamExample {json} Request example:
+ * {
+ *    "name":"Programming"
+ * }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ * {
+ *    "message":"Failed to create directory"
+ * }
+ */
+
 func (ctrl *Controller) CreateDirectoryHandler(c *gin.Context) {
 	var req RequestCreateDirectory
 

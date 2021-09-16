@@ -16,6 +16,18 @@ import (
 	"github.com/VxVxN/mdserver/pkg/tools"
 )
 
+/**
+ * @api {post} /share/:username/:id Get a share link
+ * @apiName GetSharePostHandler
+ * @apiGroup share
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 404 Not Found
+ * {
+ *    "message":"Failed to get post"
+ * }
+ */
+
 func (ctrl *Controller) GetSharePostHandler(c *gin.Context) {
 	templatePost, errObj := ctrl.getTemplateSharePost(c)
 	if errObj != nil {

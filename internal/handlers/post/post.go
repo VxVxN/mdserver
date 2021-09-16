@@ -17,6 +17,18 @@ import (
 	e "github.com/VxVxN/mdserver/pkg/error"
 )
 
+/**
+ * @api {get} /:dir/:file Get post page
+ * @apiName PostHandler
+ * @apiGroup post
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ * {
+ *    "message":"Failed to get post"
+ * }
+ */
+
 func (ctrl *Controller) PostHandler(c *gin.Context) {
 	templatePost, errObj := ctrl.getPost(c)
 	if errObj != nil {

@@ -16,6 +16,18 @@ import (
 	e "github.com/VxVxN/mdserver/pkg/error"
 )
 
+/**
+ * @api {get} / Get index page
+ * @apiName PostsHandler
+ * @apiGroup post
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Bad Request
+ * {
+ *    "message":"Failed to prepare html"
+ * }
+ */
+
 func (ctrl *Controller) PostsHandler(c *gin.Context) {
 	if errObj := ctrl.getPosts(c); errObj != nil {
 		log.Error.Printf("Failed to get edit post: %v", errObj.Error)

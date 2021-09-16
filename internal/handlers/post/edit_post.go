@@ -11,6 +11,18 @@ import (
 	"github.com/VxVxN/log"
 )
 
+/**
+ * @api {get} /edit/:dir/:file Get editing post page
+ * @apiName EditPostHandler
+ * @apiGroup post
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ * {
+ *    "message":"Failed to get post"
+ * }
+ */
+
 func (ctrl *Controller) EditPostHandler(c *gin.Context) {
 	if errObj := ctrl.getEditingPost(c); errObj != nil {
 		log.Error.Printf("Failed to edit post: %v", errObj.Error)

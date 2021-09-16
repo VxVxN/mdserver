@@ -10,12 +10,30 @@ import (
 	"github.com/russross/blackfriday"
 
 	"github.com/VxVxN/log"
+
 	"github.com/VxVxN/mdserver/pkg/tools"
 )
 
 type RequestPreview struct {
 	Text string `json:"text" binding:"required"`
 }
+
+/**
+ * @api {post} /preview Get a preview post
+ * @apiName PreviewPostHandler
+ * @apiGroup post
+ *
+ * @apiParamExample {json} Request example:
+ * {
+ *    "text":"# Header"
+ * }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ * {
+ *    "message":"Failed to write response"
+ * }
+ */
 
 func (ctrl *Controller) PreviewPostHandler(c *gin.Context) {
 	var req RequestPreview

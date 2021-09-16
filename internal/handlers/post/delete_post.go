@@ -20,6 +20,24 @@ type RequestDeletePost struct {
 	FileName string `json:"file_name" binding:"required"`
 }
 
+/**
+ * @api {post} /delete_post Delete a post
+ * @apiName DeletePostHandler
+ * @apiGroup post
+ *
+ * @apiParamExample {json} Request example:
+ * {
+ *    "dir_name":"Programming",
+ *    "file_name":"Golang"
+ * }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ * {
+ *    "message":"Failed to delete post"
+ * }
+ */
+
 func (ctrl *Controller) DeletePostHandler(c *gin.Context) {
 	var req RequestDeletePost
 

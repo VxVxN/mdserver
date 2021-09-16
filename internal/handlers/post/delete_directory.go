@@ -20,6 +20,23 @@ type RequestDeleteDirectory struct {
 	DirName string `json:"name" binding:"required"`
 }
 
+/**
+ * @api {post} /delete_directory Delete a directory
+ * @apiName DeleteDirectoryHandler
+ * @apiGroup post
+ *
+ * @apiParamExample {json} Request example:
+ * {
+ *    "name":"Programming"
+ * }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ * {
+ *    "message":"Failed to delete directory"
+ * }
+ */
+
 func (ctrl *Controller) DeleteDirectoryHandler(c *gin.Context) {
 	var req RequestDeleteDirectory
 

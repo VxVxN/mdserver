@@ -9,6 +9,12 @@ import (
 	e "github.com/VxVxN/mdserver/pkg/error"
 )
 
+/**
+ * @api {post} /log_out Log out from the site
+ * @apiName LogOut
+ * @apiGroup Login
+ */
+
 func (ctrl *Controller) LogOut(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Clear()

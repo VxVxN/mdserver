@@ -20,6 +20,24 @@ type RequestRenameDirectory struct {
 	NewDirName string `json:"new_name" binding:"required"`
 }
 
+/**
+ * @api {post} /rename_directory Rename a directory
+ * @apiName RenameDirectoryHandler
+ * @apiGroup post
+ *
+ * @apiParamExample {json} Request example:
+ * {
+ *    "old_name":"Python",
+ *    "new_name":"Golang"
+ * }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ * {
+ *    "message":"Failed to rename directory"
+ * }
+ */
+
 func (ctrl *Controller) RenameDirectoryHandler(c *gin.Context) {
 	var req RequestRenameDirectory
 

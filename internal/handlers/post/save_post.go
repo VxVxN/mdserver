@@ -23,6 +23,25 @@ type RequestSave struct {
 	Text     string `json:"text" binding:"required"`
 }
 
+/**
+ * @api {post} /save_post Save a post
+ * @apiName SavePostHandler
+ * @apiGroup post
+ *
+ * @apiParamExample {json} Request example:
+ * {
+ *    "dir_name":"Golang",
+ *    "file_name":"Microservice patterns",
+ *    "text":"# API gateway"
+ * }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ * {
+ *    "message":"Error writing the file"
+ * }
+ */
+
 func (ctrl *Controller) SavePostHandler(c *gin.Context) {
 	var req RequestSave
 

@@ -18,6 +18,30 @@ type RequestSignIn struct {
 	Password string `json:"password" binding:"required"`
 }
 
+/**
+ * @api {post} /sign_in Sign in to the site
+ * @apiName SignIn
+ * @apiGroup Login
+ *
+ * @apiParamExample {json} Request example:
+ * {
+ *    "username":"Vladimir",
+ *    "password":"123"
+ * }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Bad Request
+ * {
+ *    "message":"Incorrect login or password"
+ * }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ * {
+ *    "message":"Failed to save session"
+ * }
+ */
+
 func (ctrl *Controller) SignIn(c *gin.Context) {
 	var req RequestSignIn
 	session := sessions.Default(c)

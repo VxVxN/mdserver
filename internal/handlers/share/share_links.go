@@ -23,6 +23,18 @@ type Link struct {
 	Link      string
 }
 
+/**
+ * @api {get} /share_links Get list of sharing link
+ * @apiName ShareLinksHandler
+ * @apiGroup share
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ * {
+ *    "message":"Failed to get share link"
+ * }
+ */
+
 func (ctrl *Controller) ShareLinksHandler(c *gin.Context) {
 
 	resp, errObj := ctrl.getShareLinks(c)

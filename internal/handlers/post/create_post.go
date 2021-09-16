@@ -20,6 +20,24 @@ type RequestCreatePost struct {
 	FileName string `json:"file_name" binding:"required"`
 }
 
+/**
+ * @api {post} /create_post Create a post
+ * @apiName CreatePostHandler
+ * @apiGroup post
+ *
+ * @apiParamExample {json} Request example:
+ * {
+ *    "dir_name":"Programming",
+ *    "file_name":"Golang"
+ * }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ * {
+ *    "message":"Failed to create post"
+ * }
+ */
+
 func (ctrl *Controller) CreatePostHandler(c *gin.Context) {
 	var req RequestCreatePost
 

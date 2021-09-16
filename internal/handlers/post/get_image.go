@@ -16,6 +16,18 @@ import (
 	"github.com/VxVxN/mdserver/pkg/tools"
 )
 
+/**
+ * @api {get} /images/:image Get image
+ * @apiName GetImageHandler
+ * @apiGroup post
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 404 Not Found
+ * {
+ *    "message":"Page not found"
+ * }
+ */
+
 func (ctrl *Controller) GetImageHandler(c *gin.Context) {
 	if errObj := ctrl.getImage(c); errObj != nil {
 		log.Error.Printf("Failed to get post: %v", errObj.Error)

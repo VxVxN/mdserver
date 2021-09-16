@@ -21,6 +21,25 @@ type RequestRenamePost struct {
 	NewFileName string `json:"new_file_name" binding:"required"`
 }
 
+/**
+ * @api {post} /rename_post Rename a post
+ * @apiName RenamePostHandler
+ * @apiGroup post
+ *
+ * @apiParamExample {json} Request example:
+ * {
+ *    "dir_name":"Golang",
+ *    "old_file_name":"Patterns",
+ *    "new_file_name":"Microservice patterns"
+ * }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ * {
+ *    "message":"Failed to rename post"
+ * }
+ */
+
 func (ctrl *Controller) RenamePostHandler(c *gin.Context) {
 	var req RequestRenamePost
 

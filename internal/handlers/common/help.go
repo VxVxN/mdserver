@@ -22,14 +22,26 @@ type TemplateHelp struct {
 	IsAuth bool
 }
 
+/**
+ * @api {get} /help Return help page
+ * @apiName Help
+ * @apiGroup Common
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Not Found
+ * {
+ *    "message":"Failed to open file"
+ * }
+ */
+
 func (ctrl *Controller) Help(c *gin.Context) {
-	template, errObj := ctrl.getHelpTemplate(c)
+	helpTemplate, errObj := ctrl.getHelpTemplate(c)
 	if errObj != nil {
 		log.Error.Printf("Failed to get help template: %v", errObj.Error)
 		errObj.JsonResponse(c)
 		return
 	}
-	c.HTML(200, "help.tmpl", *template)
+	c.HTML(200, "help.tmpl", *helpTemplate)
 }
 
 func (ctrl *Controller) getHelpTemplate(c *gin.Context) (*TemplateHelp, *e.ErrObject) {

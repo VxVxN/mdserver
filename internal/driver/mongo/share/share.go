@@ -110,7 +110,7 @@ func (ms *MongoShare) DeleteLink(username, link string) *e.ErrObject {
 	if err == mongo.ErrNoDocuments {
 		return e.NewError("Share link not found", http.StatusNotFound, err)
 	} else if err != nil {
-		return e.NewError("Can't delte share link", http.StatusInternalServerError, err)
+		return e.NewError("Cannot delete share link", http.StatusInternalServerError, err)
 	}
 
 	return nil

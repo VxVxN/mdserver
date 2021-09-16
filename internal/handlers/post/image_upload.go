@@ -20,6 +20,24 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+/**
+ * @api {post} /edit/:dir/:file/image_upload Upload the image to temporary files
+ * @apiName ImageUploadHandler
+ * @apiGroup post
+ *
+ * @apiSuccessExample {json} Success response example:
+ *     HTTP/1.1 200 OK
+ * {
+ *    "image":"e8d4d5cd-d975-4d19-9551-3e29d674ecc3"
+ * }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 404 Not Found
+ * {
+ *    "message":"Image not found"
+ * }
+ */
+
 func (ctrl *Controller) ImageUploadHandler(c *gin.Context) {
 	form, err := c.MultipartForm()
 	if err != nil {
@@ -48,7 +66,7 @@ func (ctrl *Controller) copyRequestFileToTmpFile(c *gin.Context, form *multipart
 			return imageUUID, nil // processing only one file
 		}
 	}
-	return "", e.NewError("Image not found", http.StatusBadRequest, nil)
+	return "", e.NewError("Image not found", http.StatusNotFound, nil)
 }
 
 func (ctrl *Controller) copyFile(c *gin.Context, fileHeader *multipart.FileHeader) (string, *e.ErrObject) {
