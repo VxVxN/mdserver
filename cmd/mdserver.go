@@ -104,7 +104,7 @@ func InitServer() (*mdServer, error) {
 	}
 
 	pathLogs := path.Join(glob.WorkDir, "logs/md_server.log")
-
+	_ = os.Mkdir(path.Join(glob.WorkDir, "logs"), 664)
 	if err = log.Init(pathLogs, getLevelLog(config.Cfg.LevelLog), false); err != nil {
 		return nil, fmt.Errorf("can't init log: %v, path: %s", err, pathLogs)
 	}

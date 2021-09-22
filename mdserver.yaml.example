@@ -2,3 +2,4 @@
 level_log: common
 session_age: 120
 session_secret: 'secret'
+domain: localhost
