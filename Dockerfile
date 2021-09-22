@@ -1,7 +1,6 @@
-FROM arm32v7/golang:latest
+FROM golang:1.16
 
 ENV GOFLAGS="-mod=vendor" GO111MODULE=on
-ENV GOARCH=arm
 
 ADD . /app
 WORKDIR /app

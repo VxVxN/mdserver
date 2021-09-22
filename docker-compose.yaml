@@ -11,7 +11,7 @@ services:
       - ./posts:/app/posts
       - ./public/static/images:/app/public/static/images
   mongodb:
-    image: andresvidal/rpi3-mongodb3
+    image: mongo:latest
     restart: always
     ports:
       - "27017:27017"
