@@ -1,4 +1,5 @@
-﻿listen: 0.0.0.0:8890
+﻿listen: 0.0.0.0:80
+ssl: false
 level_log: common
 session_age: 120
 session_secret: 'secret'

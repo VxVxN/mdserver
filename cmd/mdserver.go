@@ -44,7 +44,7 @@ type mdServer struct {
 func main() {
 	server, err := InitServer()
 	if err != nil {
-		slog.Fatal("Failed to init md server", err)
+		slog.Fatalln("Failed to init md server", err)
 	}
 	defer server.Stop()
 
@@ -85,9 +85,7 @@ func main() {
 
 	server.router.NoRoute(noRouteHandler)
 
-	listen := config.Cfg.Listen
-	log.Info.Printf("Listening %s", listen)
-	if err = server.router.RunTLS(listen, "https-server.crt", "https-server.key"); err != nil {
+	if err = server.ListenAndServe(); err != nil {
 		log.Fatal.Printf("Failed to run router: %v", err)
 	}
 }
@@ -104,7 +102,7 @@ func InitServer() (*mdServer, error) {
 	}
 
 	pathLogs := path.Join(glob.WorkDir, "logs/md_server.log")
-	_ = os.Mkdir(path.Join(glob.WorkDir, "logs"), 664)
+	_ = os.Mkdir(path.Join(glob.WorkDir, "logs"), 0664)
 	if err = log.Init(pathLogs, getLevelLog(config.Cfg.LevelLog), false); err != nil {
 		return nil, fmt.Errorf("can't init log: %v, path: %s", err, pathLogs)
 	}
@@ -149,6 +147,21 @@ func InitServer() (*mdServer, error) {
 	return &server, nil
 }
 
+func (server *mdServer) ListenAndServe() error {
+	listen := config.Cfg.Listen
+	log.Info.Printf("Listening %s", listen)
+	if config.Cfg.IsSSL {
+		if err := server.router.RunTLS(listen, "https-server.crt", "https-server.key"); err != nil {
+			return err
+		}
+	} else {
+		if err := server.router.Run(listen); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (server *mdServer) Stop() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -173,10 +186,12 @@ func (server *mdServer) authMiddleware() gin.HandlerFunc {
 		status, err := tools.CheckSession(c)
 		if err != nil {
 			if status == http.StatusUnauthorized {
-				c.HTML(http.StatusUnauthorized, "error.tmpl", map[string]interface{}{
-					"Status": http.StatusUnauthorized,
-					"Error":  "Unauthorized",
-				})
+				c.HTML(
+					http.StatusUnauthorized, "error.tmpl", map[string]interface{}{
+						"Status": http.StatusUnauthorized,
+						"Error":  "Unauthorized",
+					},
+				)
 			} else {
 				e.NewError("Bad Request", http.StatusBadRequest, err).JsonResponse(c)
 			}
@@ -186,8 +201,10 @@ func (server *mdServer) authMiddleware() gin.HandlerFunc {
 }
 
 func noRouteHandler(c *gin.Context) {
-	c.HTML(http.StatusNotFound, "error.tmpl", map[string]interface{}{
-		"Status": http.StatusNotFound,
-		"Error":  "Page not found",
-	})
+	c.HTML(
+		http.StatusNotFound, "error.tmpl", map[string]interface{}{
+			"Status": http.StatusNotFound,
+			"Error":  "Page not found",
+		},
+	)
 }

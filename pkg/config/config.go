@@ -11,6 +11,7 @@ var Cfg *config
 // config - structure for reading the configuration file.
 type config struct {
 	Listen   string `yaml:"listen"`
+	IsSSL    bool   `yaml:"ssl"`
 	LevelLog LVLLog `yaml:"level_log"`
 	// SessionAge - in minutes
 	SessionAge    int    `yaml:"session_age"`
