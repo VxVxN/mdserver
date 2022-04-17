@@ -64,6 +64,7 @@ func main() {
 		authRouter.POST("/rename_post", server.postCtrl.RenamePostHandler)
 		authRouter.POST("/delete_post", server.postCtrl.DeletePostHandler)
 		authRouter.POST("/preview", server.postCtrl.PreviewPostHandler)
+		authRouter.POST("/headers", server.postCtrl.HeadersHandler)
 
 		authRouter.POST("/share_link", server.shareCtrl.SharePostHandler)
 		authRouter.POST("/delete_share_link", server.shareCtrl.DeleteShareLinkHandler)

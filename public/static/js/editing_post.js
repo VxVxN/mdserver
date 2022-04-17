@@ -20,6 +20,7 @@ document.getElementById("savePost").onclick = function () {
 document.getElementById("previewTab").onclick = function () {
 
     document.getElementById("editing").classList.add('d-none');
+    document.getElementById("preview").classList.remove('d-none');
 
     const previewText = document.getElementById("postText").value;
 
@@ -31,6 +32,26 @@ document.getElementById("previewTab").onclick = function () {
         return false;
     }
     sendRequest("/preview", data, successCallback);
+}
+
+document.getElementById("headersTab").onclick = function () {
+
+    document.getElementById("editing").classList.add('d-none');
+    document.getElementById("preview").classList.add('d-none');
+
+    const text = document.getElementById("postText").value;
+
+    let dirName = getDirName();
+    let fileName = getFileName();
+
+    const data = {
+        dir: dirName,
+        file: fileName,
+        text:text};
+    const successCallback = function (response) {
+        return false;
+    }
+    sendRequest("/headers", data, successCallback);
 }
 
 document.getElementById("editingTab").onclick = function () {

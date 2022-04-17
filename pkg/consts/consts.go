@@ -8,6 +8,9 @@ import (
 
 const (
 	ExtMd = ".md"
+
+	Http  = "http://"
+	Https = "https://"
 )
 
 var (

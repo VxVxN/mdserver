@@ -4,6 +4,8 @@ import (
 	"io/ioutil"
 
 	"gopkg.in/yaml.v2"
+
+	"github.com/VxVxN/mdserver/pkg/consts"
 )
 
 var Cfg *config
@@ -47,4 +49,12 @@ func InitTestConfig() {
 		SessionSecret: "secret",
 		Domain:        "testDomain.com",
 	}
+}
+
+func (cfg config) GetURL() string {
+	protocol := consts.Http
+	if cfg.IsSSL {
+		protocol = consts.Https
+	}
+	return protocol + cfg.Domain
 }
